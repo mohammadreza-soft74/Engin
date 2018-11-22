@@ -169,5 +169,25 @@ class ContainerManager
         }
     }
 
+    /**
+     * @brief stop running container.
+     * @uses self::makeDockerInstance
+     * @uses containerStop
+     * @param $containerId
+     * @throws \Exception
+     */
+    public static function stopContainer($containerId)
+    {
+        try
+        {
+            $docker = self::makeDockerInstance();
+            $docker->containerStop($containerId);
+
+        }catch (\Exception $e){
+
+            throw new \Exception("Error: couldn,t stop container! \n".$e->getMessage()."\n".$e->getFile());
+        }
+    }
+
 
 }
