@@ -136,6 +136,25 @@ class KeyManager
         }
     }
 
+    /**
+     * @brief get language config
+     * @detail get language config and other configs in it with key that contain course id
+     * @param $key
+     * @return mixed
+     * @throws \Exception
+     */
+    public static function getCourseConfig($key)
+    {
+        try {
+
+            $courseId = explode("-", $key);
+            return constant($courseId[0]);
+
+        }catch (\Exception $e){
+            throw new \Exception("Error: getCourseName() error\n".$e->getMessage() ." | page:". $e->getFile(). " | line:".$e->getLine());
+        }
+    }
+
 
 
 

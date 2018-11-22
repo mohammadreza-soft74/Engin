@@ -8,6 +8,7 @@
 
 namespace App\Clasess\Base\Memory;
 
+use Predis\Client;
 
 class RedisClientFactory
 {
