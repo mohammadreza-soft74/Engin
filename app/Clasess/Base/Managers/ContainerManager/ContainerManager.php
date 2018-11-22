@@ -343,6 +343,24 @@ class ContainerManager
         }
     }
 
+    /**
+     *  @brief get running processes on container
+     * @param $containerId
+     * @return \Docker\API\Model\ContainersIdTopGetResponse200|null|\Psr\Http\Message\ResponseInterface
+     * @throws \Exception
+     */
+    public static function getProcessInContainer($containerId)
+    {
+        try {
+
+            $docker = self::makeDockerInstance();
+            return $docker->containerTop($containerId);
+
+        }catch (\Exception $e){
+            throw new \Exception("Error: couldn't get proccess of container at this time!\n".$e->getMessage()."\n".$e->getFile());
+        }
+    }
+
 
     /**
      * @brief find open port on host 
