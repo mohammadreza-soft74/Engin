@@ -10,6 +10,8 @@ namespace App\Clasess\Base\MainActions\BaseCreate;
 
 
 use App\Clasess\Base\Managers\KeyManager\KeyManager;
+use App\Clasess\Base\Managers\ContainerManager\ContainerManager;
+use Docker\API\Model\ContainersCreatePostBody;
 
 class Create
 {
@@ -23,6 +25,7 @@ class Create
      * @see KeyManager::updateTimeStamp
      * @param $key
      * @return array
+     * @throws \Exception
      */
     protected function createContainer($key)
     {
