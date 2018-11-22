@@ -37,6 +37,31 @@ class KeyManager
     }
 
     /**
+     * @brief Set the key of new user to the corresponding containerId
+     * @param $key
+     * @param $containerId
+     * @throws \Exception
+     */
+    public static function setKeytoSpecifiedContainerId($key , $containerId)
+    {
+        $courseConfig = self::getCourseConfig($key);
+
+        try {
+            //create Redis server instance
+            $redis = RedisClientFactory::redis("key");
+            $timestamp = time();
+
+            $redis ->hmset($courseConfig["keysCacheName"].":".$key,"id", $containerId, "timeStamp", $timestamp);
+
+            $redis->disconnect();
+
+
+        } catch (\Exception $e) {
+            throw new \Exception("Error: There was a problem inserting id to the database ! .\n" . $e->getMessage()." \n".$e->getFile());
+        }
+    }
+
+    /**
      * @brief search for containerId in memory
      * @detail if container id is available returns container id else returns false
      * @param string $key
