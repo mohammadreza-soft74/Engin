@@ -154,5 +154,20 @@ class ContainerManager
         return $creation;
     }
 
+    /**
+     * @brief start container.
+     * @param $containerId
+     * @throws \Exception
+     */
+    public static function startContainer($containerId)
+    {
+        try {
+            $docker = self::makeDockerInstance();
+            $docker->containerStart($containerId);
+        } catch (\Exception $e) {
+            throw new \Exception("Error: Couldn't start the container!\n" . $e->getMessage() . "\n" . $e->getFile());
+        }
+    }
+
 
 }
