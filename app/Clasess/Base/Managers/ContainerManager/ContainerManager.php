@@ -16,6 +16,8 @@ use Docker\API\Model\HostConfig;
 use Docker\API\Model\RestartPolicy;
 use Docker\API\Model\ContainersCreatePostBody;
 use Docker\Stream\AttachWebsocketStream;
+use Docker\API\Model\ContainersIdExecPostBody;
+use Docker\API\Model\ExecIdStartPostBody;
 
 
 class ContainerManager
@@ -286,6 +288,41 @@ class ContainerManager
         }catch (\Exception $e){
             throw new \Exception("Error: getContainerState() error\n".$e->getMessage()."\n".$e->getFile());
         }
+    }
+
+    /**
+     * @brief execute given command in running container bash
+     * @param $containerId
+     * @param $command
+     * @param string $workingDir
+     * @throws \Exception
+     */
+    public static function dockerExecStart($containerId, $command, $workingDir='/home/violin')
+    {
+
+
+        try {
+
+            $docker = self::makeDockerInstance();
+
+            // SOURCE : https://github.com/docker-php/docker-php/pull/320/files?utf8=%E2%9C%93&diff=unified
+            //this snippet of code execute our command on running container
+            $execConfig = new ContainersIdExecPostBody();
+            $execConfig->setTty(true);
+            $execConfig->setAttachStdout(true);
+            $execConfig->setAttachStderr(true);
+            $execConfig->setCmd(["/bin/bash", "-c", $command]);
+            $execConfig->setWorkingDir($workingDir);
+            $execid = $docker->containerExec($containerId, $execConfig)->getId();
+            $execStartConfig = new ExecIdStartPostBody();
+            //$execStartConfig->setDetach(false);
+            // Execute the command
+            $docker->execStart($execid, $execStartConfig);
+
+        }catch (\Exception $e){
+            throw new \Exception("Error: ExecStart unSuccessful! \n".$e->getMessage()."\n".$e->getFile());
+        }
+
     }
 
 
