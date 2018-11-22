@@ -325,6 +325,24 @@ class ContainerManager
 
     }
 
+    /**
+     * @brief copying file from host to container in *.tar format
+     * @param $containerId
+     * @param $tarString
+     * @param $pathOnContainer
+     * @throws \Exception
+     */
+    public static function copyFileToSpecifiedPathInContainer($containerId, $tarString, $pathOnContainer)
+    {
+        try {
+            $docker = self::makeDockerInstance();
+            $docker->putContainerArchive($containerId, $tarString, ["path" => $pathOnContainer]);
+        }
+        catch (\Exception $e){
+            throw new \Exception("Error: an error occurred while copping files to containers\n".$e->getMessage()."\n".$e->getFile());
+        }
+    }
+
 
     /**
      * @brief find open port on host 
