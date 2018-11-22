@@ -289,9 +289,53 @@ class ContainerManager
     }
 
 
-   
+    /**
+     * @brief find open port on host 
+     * todo: change port finding structure to linear finding
+     * @return int
+     */
+    public function setPort()
+    {
+
+        $port = rand(1025,65500);
+        if(!@fsockopen("127.0.0.1",$port)) {
+
+            return $port;
+
+        }
+        else
+            self::setPort();
 
 
+
+        /* self::$currentPort = (Config::get("port.currentPort"));
+
+         if(!@fsockopen("127.0.0.1",self::$currentPort)) { //port is open
+
+             //https://stackoverflow.com/questions/25711296/how-to-edit-and-save-custom-config-files-in-laravel
+
+             return self::$currentPort;
+         }
+
+         else {
+
+             if (self::$currentPort >= 65000)
+             {
+                 self::writeToPortConfigFile(1025);
+                 self::setPort();
+             }
+             else {
+                 self::$currentPort++;
+                 self::writeToPortConfigFile(self::$currentPort);
+                 self::setPort();
+                 return self::$currentPort;
+             }
+
+         }*/
+
+    }
+    
+    
 
 
 }
