@@ -189,5 +189,37 @@ class ContainerManager
         }
     }
 
+    /**
+     * @brief attach to web socket of container.
+     * @uses containerAttachWebsocket
+     * @uses self::makeDockerInstance
+     * @param $containerId
+     * @return null|\Psr\Http\Message\ResponseInterface
+     * @throws \Exception
+     */
+    public static function containerAttachWebSocket($containerId)
+    {
+        $docker = self::makeDockerInstance();
+        try {
+
+            $webSocketStream = $docker->containerAttachWebsocket($containerId, [
+                'stream' => true,
+                'stdin' => true,
+                'stdout' => true,
+                'stderr' => true
+            ]);
+
+        }catch (\Exception $e){
+            throw new \Exception("Error: Couldn't attach the websocket!\n".$e->getMessage()."\n".$e->getFile());
+        }
+
+        if ( $webSocketStream instanceof \Psr\Http\Message\ResponseInterface )
+        {
+            throw new \Exception("Error: Couldn't attach the websocket!\n{$webSocketStream->getBody()}");
+        }
+
+        return $webSocketStream;
+    }
+
 
 }
