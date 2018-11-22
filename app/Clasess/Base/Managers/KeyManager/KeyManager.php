@@ -8,6 +8,8 @@
 
 namespace App\Clasess\Base\Managers\KeyManager;
 
+use App\Clasess\Base\Memory\RedisClientFactory;
+
 
 class KeyManager
 {
@@ -30,6 +32,36 @@ class KeyManager
             return $containerId;
         else
             return false;
+
+    }
+
+    /**
+     * @brief search for containerId in memory
+     * @detail if container id is available returns container id else returns false
+     * @param string $key
+     * @return bool
+     * @throws \Exception
+     */
+    private static function searchContainerIdInMemory($key)
+    {
+
+        $courseConfig = self::getCourseConfig($key);
+        try {
+
+            $redis = RedisClientFactory::redis("key");
+            $containerId = $redis->hget($courseConfig["keysCacheName"].":".$key,"id");
+            $redis->disconnect();
+
+            if ($containerId)
+                return $containerId;
+
+            return false;
+
+        }
+        catch (\Exception $e)
+        {
+            throw new \Exception("Error: There was a problem searching id in the database ! . \n" .$e->getMessage()."\n".$e->getFile());
+        }
 
     }
 
@@ -57,6 +89,8 @@ class KeyManager
             throw new \Exception("Error: There was a problem getting timeStamp from database ! . \n" .$e->getMessage()."\n".$e->getFile());
         }
     }
+
+
 
 
 }
