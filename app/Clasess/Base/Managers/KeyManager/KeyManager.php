@@ -8,6 +8,7 @@
 
 namespace App\Clasess\Base\Managers\KeyManager;
 
+use App\Clasess\Base\Managers\ContainerManager\ContainerManager;
 use App\Clasess\Base\Memory\RedisClientFactory;
 
 
@@ -63,6 +64,51 @@ class KeyManager
             throw new \Exception("Error: There was a problem searching id in the database ! . \n" .$e->getMessage()."\n".$e->getFile());
         }
 
+    }
+
+    /**
+     * @brief mapped ports on container
+     * @detail Docker\API\Model\ContainersIdJsonGetResponse200  setExecIDs() function input tu array because of some error
+     * @param $containerId
+     * @return mixed
+     * @throws \Exception
+     */
+    public static function mappedPortsOnContainer($containerId)
+    {
+        $output = [
+            "7681" => "display",
+            "7682" => "watcher",
+            "80" => "display"
+        ];
+
+        $docker = ContainerManager::makeDockerInstance();
+
+        try {
+            //source : https://github.com/NuBOXDevCom/docker-php-api/commit/f490742003c5c0d6f457eaa0c1f95e297cfcc744
+            //to  Fix Invalid argument foreach in /Normalizer/NetworkSettingsNormalizer.php class
+            $containerInspect = $docker->containerInspect($containerId);
+
+
+            $portBinding = $containerInspect->getHostConfig()->getPortBindings();
+
+            //get mapped ports from container inspect result
+            //convert object port binding to array
+            $portBinding = (array)$portBinding;
+
+            $keys = array_keys($portBinding);
+
+            foreach ($keys as $key) {
+
+                $portNo = explode("/",$key);
+                $ports[$output[$portNo[0]]] = $portBinding[$key][0]->getHostPort();
+
+            }
+
+            return $ports ;
+
+        }catch (\Exception $e){
+            throw new \Exception("Error: There was a problem getting mapped ports on container ! !\n".$e->getMessage()."\n".$e->getFile());
+        }
     }
 
     /**
