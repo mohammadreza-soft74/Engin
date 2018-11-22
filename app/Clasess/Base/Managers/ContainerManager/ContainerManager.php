@@ -8,6 +8,14 @@
 
 namespace App\Clasess\Base\Managers\ContainerManager;
 
+use Config;
+use Docker\Docker;
+use Docker\DockerClientFactory;
+use Docker\API\Model\PortBinding;
+use Docker\API\Model\HostConfig;
+use Docker\API\Model\RestartPolicy;
+use Docker\API\Model\ContainersCreatePostBody;
+
 
 class ContainerManager
 {
@@ -33,5 +41,81 @@ class ContainerManager
         return $docker;
     }
 
+    /**
+     * @brief make default setting
+     * @detail make a default setting to set on container
+     * @param ContainersCreatePostBody $containerConfig
+     * @param $courseConfig
+     */
+    public static function setDefaultContainerConfig(ContainersCreatePostBody $containerConfig , $courseConfig)
+    {
+        // Read default container configs and set them
+        $defaultContainerConfig = Config::get("docker.container_config");
+
+        foreach ( $defaultContainerConfig as $function => $arg )
+        {
+            $containerConfig->{$function}($arg);
+
+        }
+
+        $portMap = new \ArrayObject();  //store mapped port in array object
+
+        //if file watcher (/config/file.php) was true port 7682 mapped to a port on host
+        if ($courseConfig["file_watcher"]){
+
+            $fwPort = (new ContainerHelper())->setPort();
+            $fwportBinding = new PortBinding();
+            $fwportBinding->setHostPort($fwPort);
+            $fwportBinding->setHostIp('0.0.0.0');
+            $portMap['7682/tcp']=[$fwportBinding];
+
+        }
+
+        /**
+         * if language is web based language expose port 80 on container
+         * if language is not web based language expose port 7681 to xterm
+         * */
+        switch ($courseConfig["type"])
+        {
+            case ("local"):    //local app (normal app)
+
+                $xtermPort = (new ContainerHelper())->setPort();
+                $xtermPortBinding = new PortBinding();
+                $xtermPortBinding->setHostPort($xtermPort);
+                $xtermPortBinding->setHostIp('0.0.0.0');
+                $portMap['7681/tcp'] = [$xtermPortBinding];
+
+                break;
+
+
+            case ("web"):   //web based app
+
+                $WebPort = (new ContainerHelper())->setPort();
+                $webPortBinding = new PortBinding();
+                $webPortBinding->setHostPort($WebPort);
+                $webPortBinding->setHostIp('0.0.0.0');
+                $portMap['80/tcp'] = [$webPortBinding];
+
+                break;
+        }
+
+
+        $hostConfig = new HostConfig();
+        $hostConfig->setPortBindings($portMap);
+
+        $restartPolicy = new RestartPolicy();
+        $restartPolicy->setName("on-failure");
+        $restartPolicy->setMaximumRetryCount(5);
+        $hostConfig->setRestartPolicy($restartPolicy);
+        //todo: set swap . its must be set
+        //$hostConfig->setMemorySwap(30);
+        $hostConfig->setMemory(61457280);
+        $hostConfig->setKernelMemory(76700160);
+
+        $containerConfig->setHostConfig($hostConfig);
+
+    }
+
+    
 
 }
