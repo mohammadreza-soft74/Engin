@@ -10,6 +10,7 @@ namespace App\Clasess\Base\MainActions\BaseCodeManager;
 
 use App\Clasess\Base\Managers\KeyManager\KeyManager;
 use App\Clasess\Base\Managers\FileManager\FileManager;
+use App\Clasess\Base\Communication\CommunicateFactory;
 
 
 class BaseCodeManager
@@ -38,6 +39,36 @@ class BaseCodeManager
         ];
         return $result;
 
+    }
 
+    /**
+     * reset codes in specified path
+     * replace Default codes with user code in container
+     * @param String $path
+     * @param String $key
+     * @return array|false|null|string
+     * @throws \Exception
+     */
+    protected function resetCode(String $path, String $key)
+    {
+        KeyManager::updateTimeStamp($key);
+        $request['requestType'] = 'reset';
+        $request['path'] = $path;
+
+        $file = new FileManager();
+        $request['files'] = $file->getDefaultFiles($path,'first',$key);
+
+        $containerId = KeyManager::checkContainerIdWithKey($key);
+
+        if (!$containerId)
+            throw new \Exception("Error: Container is not available \n.check Key !" );
+
+        $webSocket = CommunicateFactory::communicateMethod("socket", $containerId);
+        $data = json_encode($request)."\n";
+        $webSocket->write($data);
+        $result = $webSocket->read(5);
+        $result = json_decode($result, true);
+
+        return $result;
     }
 }
