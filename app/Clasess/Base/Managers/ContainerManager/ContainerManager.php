@@ -15,6 +15,7 @@ use Docker\API\Model\PortBinding;
 use Docker\API\Model\HostConfig;
 use Docker\API\Model\RestartPolicy;
 use Docker\API\Model\ContainersCreatePostBody;
+use Docker\Stream\AttachWebsocketStream;
 
 
 class ContainerManager
@@ -237,6 +238,27 @@ class ContainerManager
         {
             throw new \Exception("Error: Couldn't write data to the websocket!\n".$e->getMessage()."\n".$e->getFile());
         }
+    }
+
+    /**
+     * @brief read from container web socket
+     * @param AttachWebsocketStream $webSocketStream
+     * @param int $wait
+     * @return array|false|null|string
+     * @throws \Exception
+     */
+    public static  function readFromWebSocket(AttachWebsocketStream $webSocketStream,$wait=5)
+    {
+        try
+        {
+            $response = $webSocketStream->read($wait);
+        }
+        catch (\Exception $e)
+        {
+            throw new \Exception("Error: Couldn't read data from websocket!\n".$e->getMessage()."\n".$e->getFile());
+        }
+
+        return $response;
     }
 
 
