@@ -367,7 +367,7 @@ class ContainerManager
      * todo: change port finding structure to linear finding
      * @return int
      */
-    public function setPort()
+    public static function setPort()
     {
 
         $port = rand(1025,65500);
