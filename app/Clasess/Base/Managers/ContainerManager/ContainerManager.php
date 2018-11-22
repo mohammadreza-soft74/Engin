@@ -261,5 +261,37 @@ class ContainerManager
         return $response;
     }
 
+    /**
+     * @brief get state of container.
+     * @detail get container state if its running state=1 else state=0
+     * @param $containerId
+     * @return bool|null
+     * @throws \Exception
+     */
+    public static function getContainerState($containerId)
+    {
+
+        try {
+
+            $docker = self::makeDockerInstance();
+            $inspection = $docker->containerInspect($containerId);
+
+            if ($inspection instanceof \Psr\Http\Message\ResponseInterface)
+                throw new \Exception('Error : The container may not exist !');
+
+            $result = $docker->containerInspect($containerId)->getState()->getRunning();
+
+            return $result;
+
+        }catch (\Exception $e){
+            throw new \Exception("Error: getContainerState() error\n".$e->getMessage()."\n".$e->getFile());
+        }
+    }
+
+
+   
+
+
+
 
 }
