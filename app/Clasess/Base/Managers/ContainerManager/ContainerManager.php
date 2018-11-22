@@ -221,5 +221,23 @@ class ContainerManager
         return $webSocketStream;
     }
 
+    /**
+     * @brief write to container websocket
+     * @param AttachWebsocketStream $webSocketStream
+     * @param $data
+     * @throws \Exception
+     */
+    public static function writeToWebSocket(AttachWebsocketStream $webSocketStream, $data)
+    {
+        try
+        {
+            $webSocketStream->write($data);
+        }
+        catch (\Exception $e)
+        {
+            throw new \Exception("Error: Couldn't write data to the websocket!\n".$e->getMessage()."\n".$e->getFile());
+        }
+    }
+
 
 }
