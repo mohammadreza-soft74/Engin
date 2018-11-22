@@ -33,5 +33,30 @@ class KeyManager
 
     }
 
+    /**
+     * @brief update user action time on redis.
+     * @detail update user main actions time on redis, in each main actions such as page load or run this time update in redis to help stop user container.
+     * @param $key
+     * @throws \Exception
+     */
+    public static function updateTimeStamp($key)
+    {
+        $courseConfig = self::getCourseConfig($key);
+        try {
+
+            // for store key an container id in Redis
+            $redis = RedisClientFactory::redis("key");
+
+            $redis->hset($courseConfig["keysCacheName"].":".$key,"timeStamp",time());
+
+            $redis->disconnect();
+
+
+        }catch (\Exception $e){
+
+            throw new \Exception("Error: There was a problem getting timeStamp from database ! . \n" .$e->getMessage()."\n".$e->getFile());
+        }
+    }
+
 
 }
