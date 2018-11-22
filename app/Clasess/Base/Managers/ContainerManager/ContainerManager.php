@@ -116,6 +116,43 @@ class ContainerManager
 
     }
 
-    
+    /**
+     * @brief creating container.
+     * 
+     * @uses self::makeDockerInstance 
+     * @uses containerCreate
+     * @param ContainersCreatePostBody $containerConfig
+     * @param $key
+     * @return \Docker\API\Model\ContainersCreatePostResponse201|null|\Psr\Http\Message\ResponseInterface
+     * @throws \Exception
+     */
+    public static function createContainer(ContainersCreatePostBody $containerConfig, $key )
+    {
+        // Create ContainerHelper
+        try
+        {
+            $docker = self::makeDockerInstance();
+            $creation = $docker->containerCreate($containerConfig,["name" => $key]);
+        }
+        catch ( \Exception $e )
+        {
+            throw new \Exception("Error: Couldn't create the container!\n".$e->getMessage().$e->getFile());
+        }
+
+        /*
+         * Check if it was successful.
+         * create method of containerManager returns one of these two cases :
+         *      failed  : \Psr\Http\Message\ResponseInterface
+         *      succeed : \Docker\API\Model\ContainerCreateResult
+         */
+        if ( $creation instanceof \Psr\Http\Message\ResponseInterface )
+        {
+            throw new \Exception("Error: Couldn't create the container!\n{$creation->getBody()}");
+        }
+
+        // If the creation was successful, we have an instance of the ContainerCreateResult class
+        return $creation;
+    }
+
 
 }
