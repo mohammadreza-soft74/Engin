@@ -16,19 +16,37 @@ class WebSocket
 
     public function __construct($containerId)
     {
-        $this->webSocketStream = ContainerManager::containerAttachWebSocket($containerId);
+        try {
+
+            $this->webSocketStream = ContainerManager::containerAttachWebSocket($containerId);
+
+        }catch (\Exception $e){
+            throw $e;
+        }
     }
 
-    // write to web socket
+    /**
+     * @param $data
+     * @throws \Exception
+     */
     public function write($data)
     {
-        ContainerManager::writeToWebSocket($this->webSocketStream,$data);
+        try {
+            ContainerManager::writeToWebSocket($this->webSocketStream, $data);
+        }catch (\Exception $e){
+            throw $e;
+        }
     }
 
     // read from web socket
     public function read($wait)
     {
-        $response = ContainerManager::readFromWebSocket($this->webSocketStream,$wait);
+        try {
+
+            $response = ContainerManager::readFromWebSocket($this->webSocketStream, $wait);
+        }catch (\Exception $e){
+            throw $e;
+        }
 
         return $response;
     }
