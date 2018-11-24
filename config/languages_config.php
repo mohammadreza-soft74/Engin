@@ -36,7 +36,7 @@ return[
         "ResultHandler" => \App\Clasess\Languages\Interpreted\Python\ResultHandler\ResultHandler::class,
         "lang" => "python",
         "files_on_host" =>getenv("HOME").DIRECTORY_SEPARATOR."python/default_files/python",
-        "ContainerFiles" =>"/home/python",
+        "ContainerFiles" =>"/home/violin/python",
         "pathCacheName" => "python_path",
         "keysCacheName" => "python_elementary",
         "runner_path"=>"/home/violin",

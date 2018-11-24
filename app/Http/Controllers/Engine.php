@@ -121,6 +121,38 @@ class Engine extends Controller
 
     }
 
+    /**
+     * @param Request $request
+     * @return array
+     */
+    public function resetUserCode(Request $request)
+    {
+        try
+        {
+            $key = null;
+            //validate incoming request with defined rule
+            $req = RequestValidate::resetFinalValidator($request);
+            $key = $req['key'];
+
+            $courseConfig = KeyManager::getCourseConfig($key);
+
+            $languageActions = new $courseConfig["LanguageActions"];
+            $result = $languageActions->resetCode($req);
+
+            $resultHandler = new $courseConfig["ResultHandler"];
+            $result = $resultHandler->codes($result);
+
+        }catch (\Exception $e){
+
+            return $this->generateRunError($e->getMessage(), $key);
+        }
+
+
+
+        return $result;
+
+    }
+
 
 
     function generateRunError($message, $key)
