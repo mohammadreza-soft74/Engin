@@ -30,6 +30,7 @@ class BaseCreate
     protected function createContainer($key)
     {
         $containerId = KeyManager::checkContainerIdWithKey($key);  // check container availability with key on system
+        $stats = null;
 
         switch($containerId){   // if container is available start it else create new container
 

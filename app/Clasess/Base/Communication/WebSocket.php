@@ -14,15 +14,14 @@ class WebSocket
 {
     private $webSocketStream;
 
+    /**
+     * WebSocket constructor.
+     * @param $containerId
+     * @throws \Exception
+     */
     public function __construct($containerId)
     {
-        try {
-
-            $this->webSocketStream = ContainerManager::containerAttachWebSocket($containerId);
-
-        }catch (\Exception $e){
-            throw $e;
-        }
+        $this->webSocketStream = ContainerManager::containerAttachWebSocket($containerId);
     }
 
     /**
@@ -31,22 +30,19 @@ class WebSocket
      */
     public function write($data)
     {
-        try {
-            ContainerManager::writeToWebSocket($this->webSocketStream, $data);
-        }catch (\Exception $e){
-            throw $e;
-        }
+
+        ContainerManager::writeToWebSocket($this->webSocketStream, $data);
+
     }
 
-    // read from web socket
+    /**
+     * @param $wait
+     * @return array|false|null|string
+     * @throws \Exception
+     */
     public function read($wait)
     {
-        try {
-
-            $response = ContainerManager::readFromWebSocket($this->webSocketStream, $wait);
-        }catch (\Exception $e){
-            throw $e;
-        }
+        $response = ContainerManager::readFromWebSocket($this->webSocketStream, $wait);
 
         return $response;
     }
