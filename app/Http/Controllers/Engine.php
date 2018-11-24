@@ -60,8 +60,7 @@ class Engine extends Controller
 
         try {
 
-
-
+            $key= null;
             //validate incoming request with defined rule
             $req = RequestValidate::pageloadValidator($request);
 
@@ -90,8 +89,11 @@ class Engine extends Controller
     }
 
 
-    function generateRunError($message,$key)
+    function generateRunError($message, $key)
     {
+
+        if ($key == null)
+            $key = 'keyless_error';
 
         $persianDate = new Calender();
         $now = now();

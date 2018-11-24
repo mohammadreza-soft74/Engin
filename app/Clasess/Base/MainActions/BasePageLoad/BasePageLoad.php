@@ -20,10 +20,10 @@ class BasePageLoad
      * @return bool
      * @throws \Exception
      */
-    protected function PageLoad($data)
+    protected function PageLoad($req)
     {
 
-        $key = $data->key;
+        $key = $req['key'];
 
         if (!$containerId = KeyManager::checkContainerIdWithKey($key))
             throw new \Exception("Error: Container is not available \n.check Key " );

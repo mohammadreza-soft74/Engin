@@ -109,8 +109,8 @@ class BaseResultHandler
             return (string)$result;
 
 
-         if ($result['error'] == true)
-             throw new \Exception("An error occurred on Container!\n" .$result["message"]);
+         /*if ($result['error'] == true)
+             throw new \Exception("An error occurred on Container!\n" .$result["message"]);*/
 
 
         return [

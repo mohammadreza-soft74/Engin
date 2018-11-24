@@ -66,7 +66,7 @@ class ContainerManager
         //if file watcher (/config/file.php) was true port 7682 mapped to a port on host
         if ($courseConfig["file_watcher"]){
 
-            $fwPort = (new ContainerHelper())->setPort();
+            $fwPort = self::setPort();
             $fwportBinding = new PortBinding();
             $fwportBinding->setHostPort($fwPort);
             $fwportBinding->setHostIp('0.0.0.0');
@@ -82,7 +82,7 @@ class ContainerManager
         {
             case ("local"):    //local app (normal app)
 
-                $xtermPort = (new ContainerHelper())->setPort();
+                $xtermPort = self::setPort();
                 $xtermPortBinding = new PortBinding();
                 $xtermPortBinding->setHostPort($xtermPort);
                 $xtermPortBinding->setHostIp('0.0.0.0');
@@ -93,7 +93,7 @@ class ContainerManager
 
             case ("web"):   //web based app
 
-                $WebPort = (new ContainerHelper())->setPort();
+                $WebPort = self::setPort();
                 $webPortBinding = new PortBinding();
                 $webPortBinding->setHostPort($WebPort);
                 $webPortBinding->setHostIp('0.0.0.0');
