@@ -8,6 +8,11 @@ use App\Clasess\Base\RequestValidate\RequestValidate;
 use App\Clasess\Calender\Calender;
 use DateTime;
 use DateTimeZone;
+use Config;
+
+define("1" , Config::get("languages_config.python"));
+define("3" , Config::get("languages_config.java"));
+define("2", Config::get("languages_config.javascript"));
 
 class Engine extends Controller
 {
@@ -42,6 +47,46 @@ class Engine extends Controller
 
             return $this->generateRunError($e->getMessage()." | ". $e->getFile() . " | ". $e->getLine(),$key);
         }
+    }
+
+
+    /**
+     * @param Request $request
+     * @return array
+     */
+    public function pageLoad(Request $request)
+    {
+
+
+        try {
+
+
+
+            //validate incoming request with defined rule
+            $req = RequestValidate::pageloadValidator($request);
+
+            $key = $req['key'];
+
+            $courseConfig = KeyManager::getCourseConfig($key);
+            //call onLoadComplete() function to something on moodle page load
+            //Returns the user's code unless the code exists
+
+            $languageActions = new $courseConfig["LanguageActions"];
+            $result = $languageActions->pageLoad($req);
+
+
+            $resultHandler = new $courseConfig["ResultHandler"];
+            $result = $resultHandler->pageLoad($result);
+
+        }catch (\Exception $e){
+
+            return $this->generateRunError($e->getMessage(),$key);
+        }
+
+
+
+        return $result;
+
     }
 
 
