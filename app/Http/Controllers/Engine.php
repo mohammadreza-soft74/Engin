@@ -146,15 +146,45 @@ class Engine extends Controller
 
             return $this->generateRunError($e->getMessage(), $key);
         }
-
-
-
         return $result;
-
     }
 
 
+    /**
+     * @param Request $request
+     * @return array
+     */
+    public function setFinalCode(Request $request)
+    {
+        try {
 
+            $key = null;
+            //validate incoming request with defined rule
+            $req = RequestValidate::resetFinalValidator($request);
+            $key = $req['key'];
+
+            $courseConfig = KeyManager::getCourseConfig($key);
+
+            $languageActions = new $courseConfig["LanguageActions"];
+            $result = $languageActions->finalCode($req);
+
+            $resultHandler = new $courseConfig["ResultHandler"];
+            $result = $resultHandler->codes($result);
+
+        }catch (\Exception $e){
+
+            return $this->generateRunError($e->getMessage(),$key);
+        }
+
+        return $result;
+    }
+
+
+    /**
+     * @param $message
+     * @param $key
+     * @return array
+     */
     function generateRunError($message, $key)
     {
 
