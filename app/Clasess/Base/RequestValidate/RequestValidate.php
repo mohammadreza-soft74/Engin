@@ -114,4 +114,25 @@ class RequestValidate
 
         return $ret;
     }
+
+    /**
+     * @param Request $request
+     * @return array
+     * @throws \Exception
+     */
+    public static function resetFinalValidator(Request $request)
+    {
+
+        $validator = Validator::make($request->all(), [
+            'path' => 'required|string',
+            'key' => 'required|string'
+        ]);
+        if ($validator->fails())
+            throw  new \Exception($validator->messages());
+
+        return[
+            'key' => $request->key,
+            'path' => $request->path,
+        ];
+    }
 }
