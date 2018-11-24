@@ -35,8 +35,9 @@ class PageLoad extends BasePageLoad
                 exec("kill -9 $process[1]");
         }
 
-        $path = ['path'];
-        $path = "/home/violin/python$path";
+
+        $path = "/home/violin/python".$req['path'];
+
         ContainerManager::dockerExecStart( $this->containerId, "PORT=7682 START=$path node /home/violin/xterm/demo/files.js 2>> /home/violin/log.txt",$path);
 
         $this->checkProcess($processes);
