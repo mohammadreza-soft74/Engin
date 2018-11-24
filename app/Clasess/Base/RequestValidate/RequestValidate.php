@@ -22,6 +22,7 @@ class RequestValidate
      */
     public static function createValidator(Request $request)
     {
+        $res = [];
 
         $validator = Validator::make($request->all(), [
             'key' => 'required|string'
@@ -30,9 +31,31 @@ class RequestValidate
         if ($validator->fails())
             throw  new \Exception($validator->messages());
 
-        $request['key'] = $request->keys;
+        $req['key'] = $request->key;
 
-        return $request;
+        return $req;
 
+    }
+
+    /**
+     * @param Request $request
+     * @return array
+     * @throws \Exception
+     */
+    public static function pageloadValidator(Request $request)
+    {
+        $req = [];
+
+        $validator = Validator::make($request->all(), [
+            'path' => 'required|string',
+            'key' => 'required|string'
+        ]);
+        if ($validator->fails())
+            throw  new \Exception($validator->messages());
+
+        $req['key'] = $request->key;
+        $req['path'] = $request->path;
+
+        return $req;
     }
 }
