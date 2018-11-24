@@ -18,3 +18,5 @@ Route::post("/pageload", "Engine@pageLoad");
 Route::post("/run", "Engine@run");
 Route::post("/reset", "Engine@resetUserCode");
 Route::post("/final", "Engine@setFinalCode");
+Route::post("/update", "Engine@updateContainerRunnerApplication");
+

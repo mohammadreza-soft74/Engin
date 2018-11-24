@@ -181,6 +181,29 @@ class Engine extends Controller
 
 
     /**
+     * @param Request $request
+     * @return mixed
+     * @throws \Exception
+     */
+    public function updateContainerRunnerApplication(Request $request)
+    {
+
+        try {
+            $req = RequestValidate::updateRequestValidator($request);
+            $courseConfig = KeyManager::getCourseConfig($req['courseId'] . "-0");
+
+            $languageActions = new $courseConfig["LanguageActions"];
+            $result = $languageActions->updateRunnerApplication($req['courseId'], $req['runnerTarFile']);
+
+        }catch (\Exception $e){
+            throw new \Exception("Error: Runner application update failed!\n".$e->getFile()." ".$e->getMessage());
+        }
+
+        return $result;
+    }
+
+
+    /**
      * @param $message
      * @param $key
      * @return array

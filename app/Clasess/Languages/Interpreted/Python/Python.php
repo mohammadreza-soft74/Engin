@@ -9,6 +9,7 @@
 namespace App\Clasess\Languages\Interpreted\Python;
 
 
+use App\Clasess\Base\Update\Update;
 use App\Clasess\Languages\Interpreted\Python\MainActions\CodeManage\CodeManage;
 use App\Clasess\Languages\Interpreted\Python\MainActions\Create\Create;
 use App\Clasess\Languages\Interpreted\Python\MainActions\PageLoad\PageLoad;
@@ -79,6 +80,18 @@ class Python
         $final = new CodeManage();
         $result = $final->finalCode($request['path'], $request['key']);
 
+        return $result;
+    }
+
+    /**
+     * @param $courseId
+     * @param $runnerTarFile
+     * @return mixed
+     */
+    public function updateRunnerApplication($courseId, $runnerTarFile)
+    {
+        $update = new \App\Clasess\Languages\Interpreted\Python\Update\Update();
+        $result = $update->updateRunnerApplication($courseId, $runnerTarFile);
         return $result;
     }
 }
