@@ -82,11 +82,45 @@ class Engine extends Controller
             return $this->generateRunError($e->getMessage(),$key);
         }
 
+        return $result;
+    }
 
+    /**
+     * @param Request $request
+     * @return array
+     * @throws \Exception
+     */
+    function run(Request $request)
+    {
+        $key= null;
+        // Validate Request
+        $req = RequestValidate::runValidator($request);
+
+        $key = $req["key"];
+
+        // Get type from config, so we will know how we should run this language codes
+        $courseConfig = KeyManager::getCourseConfig($req["key"]);
+
+        // Run Request
+        try {
+
+            $run = new $courseConfig["LanguageActions"];
+            $result = $run->run($req);
+
+            // Handle(Manage) the result
+            $resultHandler = new $courseConfig["ResultHandler"];
+            $result = $resultHandler->run($result);
+
+        } catch (\Exception $e) {
+            return $this->generateRunError($e->getMessage(),$key);
+        }
+
+        // OK
 
         return $result;
 
     }
+
 
 
     function generateRunError($message, $key)
