@@ -29,5 +29,16 @@ class Python
         return $result;
     }
 
+    /**
+     * @param $request
+     * @return bool|mixed
+     * @throws \Exception
+     */
+    public function pageLoad($request)
+    {
+        $pageLoad = new PageLoad();
+        $result = $pageLoad->PageLoad($request);
 
+        return $result;
+    }
 }
