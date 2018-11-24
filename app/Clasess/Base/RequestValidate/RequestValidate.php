@@ -135,4 +135,21 @@ class RequestValidate
             'path' => $request->path,
         ];
     }
+
+    public static function updateRequestValidator(Request $request)
+    {
+
+        $validator = Validator::make($request->all(), [
+            'courseId' => 'required|string',
+            'runnerTarFile' => 'required|string'
+        ]);
+        if ($validator->fails())
+            throw  new \Exception($validator->messages());
+
+        return[
+            'courseId' => $request->courseId,
+            'runnerTarFile' => $request->runnerTarFile,
+        ];
+    }
+
 }
