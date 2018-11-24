@@ -41,4 +41,17 @@ class Python
 
         return $result;
     }
+
+    /**
+     * @param $request
+     * @return mixed
+     * @throws \Exception
+     */
+    public function run($request)
+    {
+        $run = new Run();
+        $result = $run->run($request);
+
+        return $result;
+    }
 }
