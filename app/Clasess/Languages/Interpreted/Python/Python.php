@@ -9,7 +9,7 @@
 namespace App\Clasess\Languages\Interpreted\Python;
 
 
-use App\Clasess\Base\Update\Update;
+
 use App\Clasess\Languages\Interpreted\Python\MainActions\CodeManage\CodeManage;
 use App\Clasess\Languages\Interpreted\Python\MainActions\Create\Create;
 use App\Clasess\Languages\Interpreted\Python\MainActions\PageLoad\PageLoad;
