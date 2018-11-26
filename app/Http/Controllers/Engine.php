@@ -190,10 +190,9 @@ class Engine extends Controller
 
         try {
             $req = RequestValidate::updateRequestValidator($request);
-            $courseConfig = KeyManager::getCourseConfig($req['courseId'] . "-0");
 
-            $languageActions = new $courseConfig["LanguageActions"];
-            $result = $languageActions->updateRunnerApplication($req['courseId'], $req['runnerTarFile']);
+            $update = new Update();
+            $result = $update->updateRunnerApplicationOnContainer($req['courseId'], $req['runnerTarFile']);
 
         }catch (\Exception $e){
             throw new \Exception("Error: Runner application update failed!\n".$e->getFile()." ".$e->getMessage());

@@ -42,6 +42,10 @@ class PageLoad extends BasePageLoad
         return $result;
     }
 
+    /**
+     * @param $processes
+     * @throws \Exception
+     */
     private function checkProcess($processes)
     {
         if ($this->processLoopCount >= 3)
