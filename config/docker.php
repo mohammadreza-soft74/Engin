@@ -17,7 +17,7 @@ return [
     */
 
     'connection' => [
-        'remote_socket' => env('DOCKER_REMOTE_SOCKET', 'tcp://127.0.0.1:2375'),
+        'remote_socket' => env('DOCKER_REMOTE_SOCKET', 'tcp://192.168.85.34:2375'),
         'ssl' => env('DOCKER_SSL', false)
     ],
 
