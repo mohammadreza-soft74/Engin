@@ -2,19 +2,28 @@
 /**
  * Created by PhpStorm.
  * User: mohammadreza
- * Date: 11/24/18
- * Time: 2:50 PM
+ * Date: 11/26/18
+ * Time: 1:10 PM
  */
 
-namespace App\Clasess\Base\Update;
+namespace App\Clasess\Update;
 
-use App\Clasess\Base\Managers\KeyManager\KeyManager;
-use App\Clasess\Base\Memory\RedisClientFactory;
 use App\Clasess\Base\Managers\ContainerManager\ContainerManager;
+use App\Clasess\Base\Memory\RedisClientFactory;
+use App\Clasess\Base\Managers\KeyManager\KeyManager;
+
 
 class Update
 {
-    protected function updateRunnerApplication($courseId, $runnerTarFile, $type = "key")
+
+    /**
+     * @param $courseId
+     * @param $runnerTarFile
+     * @param string $type
+     * @return string
+     * @throws \Exception
+     */
+    public function updateRunnerApplicationOnContainer($courseId, $runnerTarFile, $type = "key")
     {
         $courseConfig = KeyManager::getCourseConfig($courseId."-1");    // get python config
         $redis = RedisClientFactory::redis($type);
@@ -35,7 +44,5 @@ class Update
         }
 
         return "updating ".$courseConfig["lang"] ." containers done successfully";
-
-
     }
 }
