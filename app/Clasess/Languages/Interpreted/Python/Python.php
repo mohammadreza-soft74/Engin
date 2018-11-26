@@ -83,15 +83,4 @@ class Python
         return $result;
     }
 
-    /**
-     * @param $courseId
-     * @param $runnerTarFile
-     * @return mixed
-     */
-    public function updateRunnerApplication($courseId, $runnerTarFile)
-    {
-        $update = new \App\Clasess\Languages\Interpreted\Python\Update\Update();
-        $result = $update->updateRunnerApplication($courseId, $runnerTarFile);
-        return $result;
-    }
 }
