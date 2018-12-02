@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Clasess\Update\Update;
 use Illuminate\Http\Request;
 use App\Clasess\Base\Managers\KeyManager\KeyManager;
 use App\Clasess\Base\RequestValidate\RequestValidate;
