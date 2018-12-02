@@ -13,10 +13,10 @@ use Illuminate\Http\Request;
 |
 */
 
-Route::post("/create", "Engine@createContainer");
-Route::post("/pageload", "Engine@pageLoad");
-Route::post("/run", "Engine@run");
-Route::post("/reset", "Engine@resetUserCode");
-Route::post("/final", "Engine@setFinalCode");
-Route::post("/update", "Engine@updateContainerRunnerApplication");
+Route::post("/create", "Engine@createContainer")->middleware('ipRestrict');
+Route::post("/pageload", "Engine@pageLoad")->middleware('ipRestrict');
+Route::post("/run", "Engine@run")->middleware('ipRestrict');
+Route::post("/reset", "Engine@resetUserCode")->middleware('ipRestrict');
+Route::post("/final", "Engine@setFinalCode")->middleware('ipRestrict');
+Route::post("/update", "Engine@updateContainerRunnerApplication")->middleware('ipRestrict');
 
