@@ -25,6 +25,7 @@ class ContainerManager
 
     /**
      * @brief create docker instance.
+     *
      * @detail create instance of docker object with our config.
      * @return Docker
      */
@@ -45,10 +46,13 @@ class ContainerManager
     }
 
     /**
-     * @brief make default setting
-     * @detail make a default setting to set on container
+     * @brief make default setting.
+     *
+     * @detail make a default setting to set on container.
+     *
      * @param ContainersCreatePostBody $containerConfig
      * @param $courseConfig
+     * @throws \Exception
      */
     public static function setDefaultContainerConfig(ContainersCreatePostBody $containerConfig , $courseConfig)
     {
@@ -159,6 +163,7 @@ class ContainerManager
 
     /**
      * @brief start container.
+     *
      * @param $containerId
      * @throws \Exception
      */
@@ -174,6 +179,7 @@ class ContainerManager
 
     /**
      * @brief stop running container.
+     *
      * @uses self::makeDockerInstance
      * @uses containerStop
      * @param $containerId
@@ -194,6 +200,7 @@ class ContainerManager
 
     /**
      * @brief attach to web socket of container.
+     *
      * @uses containerAttachWebsocket
      * @uses self::makeDockerInstance
      * @param $containerId
@@ -225,7 +232,8 @@ class ContainerManager
     }
 
     /**
-     * @brief write to container websocket
+     * @brief write to container websocket.
+     *
      * @param AttachWebsocketStream $webSocketStream
      * @param $data
      * @throws \Exception
@@ -243,7 +251,8 @@ class ContainerManager
     }
 
     /**
-     * @brief read from container web socket
+     * @brief read from container web socket.
+     *
      * @param AttachWebsocketStream $webSocketStream
      * @param int $wait
      * @return array|false|null|string
@@ -265,6 +274,7 @@ class ContainerManager
 
     /**
      * @brief get state of container.
+     *
      * @detail get container state if its running state=1 else state=0
      * @param $containerId
      * @return bool|null
@@ -291,7 +301,8 @@ class ContainerManager
     }
 
     /**
-     * @brief execute given command in running container bash
+     * @brief execute given command in running container bash.
+     *
      * @param $containerId
      * @param $command
      * @param string $workingDir
@@ -326,7 +337,8 @@ class ContainerManager
     }
 
     /**
-     * @brief copying file from host to container in *.tar format
+     * @brief copying file from host to container in *.tar format.
+     *
      * @param $containerId
      * @param $tarString
      * @param $pathOnContainer
@@ -344,7 +356,8 @@ class ContainerManager
     }
 
     /**
-     *  @brief get running processes on container
+     * @brief get running processes on container.
+     *
      * @param $containerId
      * @return \Docker\API\Model\ContainersIdTopGetResponse200|null|\Psr\Http\Message\ResponseInterface
      * @throws \Exception
@@ -363,49 +376,35 @@ class ContainerManager
 
 
     /**
-     * @brief find open port on host 
-     * todo: change port finding structure to linear finding
-     * @return int
+     * @brief find open port on host.
+     *
+     * @return mixed
+     * @throws \Exception
      */
     public static function setPort()
     {
+        $start = Config::get('port.start');
+        $end = Config::get('port.end');
+        $excluded_ports = Config::get('port.excluded_ports');
+        $current_port = Config::get('port.currentPort');
 
-        $port = rand(1025,65500);
-        if(!@fsockopen("127.0.0.1",$port)) {
+        if($current_port > $end | $current_port < $start)
+            throw new \Exception("Error : ports ended in this host!");
 
-            return $port;
+        $current_port++;
 
-        }
+        if (in_array($current_port, $excluded_ports))
+            $current_port++;
+
+        config(['port.currentPort' => $current_port]);
+        $fp = fopen(base_path() .'/config/port.php' , 'w');
+        fwrite($fp, '<?php return ' . var_export(config('port'), true) . ';');
+        fclose($fp);
+
+        if(!@fsockopen("127.0.0.1",$current_port))
+            return $current_port;
         else
             self::setPort();
-
-
-
-        /* self::$currentPort = (Config::get("port.currentPort"));
-
-         if(!@fsockopen("127.0.0.1",self::$currentPort)) { //port is open
-
-             //https://stackoverflow.com/questions/25711296/how-to-edit-and-save-custom-config-files-in-laravel
-
-             return self::$currentPort;
-         }
-
-         else {
-
-             if (self::$currentPort >= 65000)
-             {
-                 self::writeToPortConfigFile(1025);
-                 self::setPort();
-             }
-             else {
-                 self::$currentPort++;
-                 self::writeToPortConfigFile(self::$currentPort);
-                 self::setPort();
-                 return self::$currentPort;
-             }
-
-         }*/
-
     }
     
     
