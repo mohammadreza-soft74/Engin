@@ -23,9 +23,7 @@ class IpMiddleware
 
         else
         {
-            $response = $next($request);
-            $response->setContent(json_encode(["Message"=>"*Attention* sorry you are not allowed to communicate with this server!" , "ip"=>$request->ip()]));
-            return $response;
+            abort(404);
         }
     }
 }
