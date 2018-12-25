@@ -45,7 +45,7 @@ class StopContainer extends Command
         print_r(" time                          KEY                      status\n");
         $stopHoures = Config::get("docker.container_stop_time.houres");
         $stopMinutes = Config::get("docker.container_stop_time.minutes");
-
+        $stopLogPath = $errorLogPath = Config::get("logs.stop.path");
         // for store key an container id in Redis
         $redis = RedisClientFactory::redis("key");
 
@@ -79,7 +79,7 @@ class StopContainer extends Command
                     if ($stat) {
                         ContainerManager::stopContainer($containerId);
                         $log = "Container $key Stoped!\nelapsed time => $houres:$minutes:$secconds\n*****************************************************\n";
-                        error_log($log, 3, "/home/mohammadreza/violin/stopLog");
+                        error_log($log, 3, $stopLogPath);
 
                         print_r("$time            $key   ");
                         print_r("            Stopped\n");
