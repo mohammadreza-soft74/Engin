@@ -28,7 +28,7 @@ class Engine extends Controller
         try{
 
 
-
+            $key = null;
             $req = RequestValidate::createValidator($request);
             $key = $req["key"];
 
@@ -46,7 +46,7 @@ class Engine extends Controller
 
         }catch (\Exception $e){
 
-            return $this->generateRunError($e->getMessage()." | ". $e->getFile() . " | ". $e->getLine(),$key);
+            return $this->generateRunError($e->getMessage(),$key);
         }
     }
 
@@ -93,17 +93,19 @@ class Engine extends Controller
      */
     function run(Request $request)
     {
-        $key= null;
-        // Validate Request
-        $req = RequestValidate::runValidator($request);
 
-        $key = $req["key"];
-
-        // Get type from config, so we will know how we should run this language codes
-        $courseConfig = KeyManager::getCourseConfig($req["key"]);
-
-        // Run Request
         try {
+
+            $key= null;
+            // Validate Request
+            $req = RequestValidate::runValidator($request);
+
+            $key = $req["key"];
+
+            // Get type from config, so we will know how we should run this language codes
+            $courseConfig = KeyManager::getCourseConfig($req["key"]);
+
+            // Run Request
 
             $run = new $courseConfig["LanguageActions"];
             $result = $run->run($req);
@@ -227,7 +229,8 @@ class Engine extends Controller
 
 
         $error = "$message\n\n|time>> $time <<time| ----- |Date>> $date <<Date| \n******************************************************************\n";
-        error_log($error,3,"/home/mohammadreza/violin/log/$key");
+        $errorLogPath = Config::get("logs.error.path");
+        error_log($error,3,"$errorLogPath$key");
         return [
             "error" => true,
             "message" => $message
