@@ -40,6 +40,8 @@ return[
         "pathCacheName" => "python_path",
         "keysCacheName" => "python_elementary",
         "runner_path"=>"/home/violin",
+        "container_default_files" => "/home/mohammadreza/Desktop/Python_Runner/Runner/python",
+        "container_shared_files" => "/home/mohammadreza/PythonContainerts/",
         "file_watcher"=> true,
     ],
 
@@ -79,8 +81,8 @@ return[
         "path" => getenv("HOME").DIRECTORY_SEPARATOR."javascript/path/javascript_path.json",
         "ContainerFiles" =>"/var/www/html/js",
         "runner_path"=> "/home/violin",
-        "pathCacheName" => "javascript_path",
         "keysCacheName" => "javascript_keys",
+        "container_files" => "/home/mohammadreza/Desktop/Python_Runner/Runner/python",
         "file_watcher"=>true,
 
     ],

@@ -10,32 +10,40 @@ namespace App\Clasess\Languages\Interpreted\Python\MainActions\Run;
 
 
 use App\Clasess\Base\MainActions\BaseRun\BaseRun;
+use App\Clasess\Base\Managers\FileManager\FileManager;
 use App\Clasess\Base\Managers\KeyManager\KeyManager;
 use App\Clasess\Base\Managers\ContainerManager\ContainerManager;
 
 class Run extends BaseRun
 {
+    /**
+     * @brief  run python code
+     *
+     * @param $req
+     * @return mixed
+     * @throws \Exception
+     */
     public function run($req)
     {
-        $result = parent::run($req);
+        parent::run($req);
+
         $key = $req["key"];
+        $path = $req["path"];
+
         $courseConfig = KeyManager::getCourseConfig($key);
+        $container_shared_files = $courseConfig['container_shared_files'];
+
+        FileManager::createFiles($req["files"],$container_shared_files.$key.$path);
 
         if(!$containerId = KeyManager::checkContainerIdWithKey($key))
             throw new \Exception("container is not available ");
 
-        $processes = ContainerManager::getProcessInContainer($containerId);
-        foreach ($processes->getProcesses() as $process) {
-            if ($process[7] == "node /home/violin/xterm/demo/server.js python script.py")
-                exec("kill -9 $process[1]");
-
-        }
 
         $workDir = $courseConfig["ContainerFiles"].$req['path'];
-        $command = "START=$workDir PORT=7681 node /home/violin/xterm/demo/server.js {$courseConfig["exec"]} {$courseConfig["defaultFileForExecute"]} 2>> /home/violin/log.txt";
-        ContainerManager::dockerExecStart($containerId, $command, $workDir);
+        $command = "{$courseConfig["exec"]} {$courseConfig["defaultFileForExecute"]}";
 
-        return $result;
+        $execId = ContainerManager::exec($containerId, $command, $workDir);
 
+        return $execId;
     }
 }
