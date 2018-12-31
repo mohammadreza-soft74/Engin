@@ -10,6 +10,11 @@
 
 return[
 
+    //file that container code
+    "max_files_count" => 10,
+    "max_file_size" => 1000,
+
+
     /*
     |-----------------------------------------------
     |*********python language configuration*********
