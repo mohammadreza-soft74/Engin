@@ -13,5 +13,20 @@ use App\Clasess\Base\BaseResultHandler\BaseResultHandler;
 
 class ResultHandler extends BaseResultHandler
 {
+    public function run($result)
+    {
+       return[
+           "error"=>false,
+           "execId"=>$result
+       ];
+    }
 
+    public function pageLoad($result)
+    {
+        return
+            [
+                "error"=>false,
+                "execId"=>$result["execId"]
+            ];
+    }
 }
