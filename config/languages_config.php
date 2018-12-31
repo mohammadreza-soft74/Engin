@@ -80,7 +80,6 @@ return[
         "exec"=> "",
         "LanguageActions" => App\Clasess\Languages\WebBased\Javascript\Javascript::class,
         "ResultHandler" => \App\Clasess\Languages\WebBased\Javascript\ResultHandler\ResultHandler::class,
-        "type"=> "web",
         "lang"=>"javascript",
         "files_on_host"=>getenv("HOME").DIRECTORY_SEPARATOR."javascript/default_files/javascript",
         "path" => getenv("HOME").DIRECTORY_SEPARATOR."javascript/path/javascript_path.json",
