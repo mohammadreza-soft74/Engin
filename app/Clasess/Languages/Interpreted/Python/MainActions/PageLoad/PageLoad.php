@@ -11,7 +11,6 @@ namespace App\Clasess\Languages\Interpreted\Python\MainActions\PageLoad;
 
 use App\Clasess\Base\MainActions\BasePageLoad\BasePageLoad;
 use App\Clasess\Base\Managers\ContainerManager\ContainerManager;
-use App\Clasess\Base\Managers\KeyManager\KeyManager;
 
 class PageLoad extends BasePageLoad
 {
@@ -19,8 +18,9 @@ class PageLoad extends BasePageLoad
     private $containerId;
 
     /**
-     * python onLoadeComplete() function derived from PageLaod base class
-     * @param $data
+     * @brief python PageLoad() function derived from PageLaod base class
+     *
+     * @param $req
      * @return bool|mixed
      * @throws \Exception
      */
@@ -29,38 +29,12 @@ class PageLoad extends BasePageLoad
 
         $this->containerId = parent::PageLoad($req);
 
-        $processes = ContainerManager::getProcessInContainer($this->containerId);
-        foreach ($processes->getProcesses() as $process) {
-            if ($process[7] == "node /home/violin/xterm/demo/files.js")
-                exec("kill -9 $process[1]");
-        }
-
-
         $path = "/home/violin/python".$req['path'];
 
-        ContainerManager::dockerExecStart( $this->containerId, "PORT=7682 START=$path node /home/violin/xterm/demo/files.js 2>> /home/violin/log.txt",$path);
+        $execId = ContainerManager::exec( $this->containerId, "bash files.sh $path");
 
-        $this->checkProcess($processes);
-
-        $ports = KeyManager::mappedPortsOnContainer( $this->containerId);
-
-        $result["watcher"] = $ports["watcher"];
+        $result["execId"] = $execId;
 
         return $result;
-    }
-
-    /**
-     * check if process is up or not
-     * @param $processes
-     * @throws \Exception
-     */
-    private function checkProcess($processes)
-    {
-        foreach ($processes->getProcesses() as $item) {
-            if ($item[7] == "node /home/violin/xterm/demo/files.js")
-                return ;
-        }
-        $containerProcess = ContainerManager::getProcessInContainer( $this->containerId);
-        $this->checkProcess($containerProcess);
     }
 }
