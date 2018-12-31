@@ -10,18 +10,38 @@ namespace App\Clasess\Languages\Interpreted\Python\MainActions\CodeManage;
 
 
 use App\Clasess\Base\MainActions\BaseCodeManager\BaseCodeManager;
+use App\Clasess\Base\Managers\FileManager\FileManager;
 
 class CodeManage extends BaseCodeManager
 {
-    // return final codes , derived from CodeManager base class
+    /**
+     * @param String $path
+     * @param String $key
+     * @return array
+     * @throws \Exception
+     */
     public function finalCode(String $path, String $key)
     {
         return parent::finalCode($path, $key);
     }
 
-    // reset user codes in container , derived from CodeManager base class
+    /**
+     * @param String $path
+     * @param String $key
+     * @return array|false|null|string
+     * @throws \Exception
+     */
     public function resetCode(String $path, String $key)
     {
-        return parent::resetCode($path, $key);
+
+        parent::resetCode($path, $key);
+
+        FileManager::recurse_copy("/home/mohammadreza/python/default_files/python$path/first","/home/mohammadreza/$key$path");
+
+        return[
+          "error" => false,
+          "result" => "Files were successfully resetted!",
+        ];
+
     }
 }
