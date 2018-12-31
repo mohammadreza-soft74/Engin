@@ -8,8 +8,6 @@
 
 namespace App\Clasess\Languages\Interpreted\Python;
 
-
-
 use App\Clasess\Languages\Interpreted\Python\MainActions\CodeManage\CodeManage;
 use App\Clasess\Languages\Interpreted\Python\MainActions\Create\Create;
 use App\Clasess\Languages\Interpreted\Python\MainActions\PageLoad\PageLoad;
@@ -19,6 +17,8 @@ class Python
 {
 
     /**
+     * @brief create python container.
+     *
      * @param $request
      * @return array
      * @throws \Exception
@@ -45,6 +45,8 @@ class Python
     }
 
     /**
+     * @brief place user code instead of default code on container.
+     *
      * @param $request
      * @return mixed
      * @throws \Exception
@@ -58,6 +60,8 @@ class Python
     }
 
     /**
+     * @brief replace default code with user code in container.
+     *
      * @param $request
      * @return array|false|null|string
      * @throws \Exception
@@ -71,6 +75,8 @@ class Python
     }
 
     /**
+     * @brief return final code from host.
+     *
      * @param $request
      * @return array
      * @throws \Exception
