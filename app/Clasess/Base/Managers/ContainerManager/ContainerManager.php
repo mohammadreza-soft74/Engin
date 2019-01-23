@@ -8,6 +8,8 @@
 
 namespace App\Clasess\Base\Managers\ContainerManager;
 
+use App\Clasess\Base\Managers\FileManager\FileManager;
+use App\Clasess\Base\Managers\KeyManager\KeyManager;
 use Config;
 use Docker\Docker;
 use Docker\DockerClientFactory;
@@ -54,7 +56,7 @@ class ContainerManager
      * @param $courseConfig
      * @throws \Exception
      */
-    public static function setDefaultContainerConfig(ContainersCreatePostBody $containerConfig , $courseConfig)
+    public static function setDefaultContainerConfig(ContainersCreatePostBody $containerConfig , $courseConfig, $key)
     {
         // Read default container configs and set them
         $defaultContainerConfig = Config::get("docker.container_config");
@@ -65,63 +67,31 @@ class ContainerManager
 
         }
 
-        $portMap = new \ArrayObject();  //store mapped port in array object
-
-        //if file watcher (/config/file.php) was true port 7682 mapped to a port on host
-        if ($courseConfig["file_watcher"]){
-
-            $fwPort = self::setPort();
-            $fwportBinding = new PortBinding();
-            $fwportBinding->setHostPort($fwPort);
-            $fwportBinding->setHostIp('0.0.0.0');
-            $portMap['7682/tcp']=[$fwportBinding];
-
-        }
-
-        /**
-         * if language is web based language expose port 80 on container
-         * if language is not web based language expose port 7681 to xterm
-         * */
-        switch ($courseConfig["type"])
-        {
-            case ("local"):    //local app (normal app)
-
-                $xtermPort = self::setPort();
-                $xtermPortBinding = new PortBinding();
-                $xtermPortBinding->setHostPort($xtermPort);
-                $xtermPortBinding->setHostIp('0.0.0.0');
-                $portMap['7681/tcp'] = [$xtermPortBinding];
-
-                break;
-
-
-            case ("web"):   //web based app
-
-                $WebPort = self::setPort();
-                $webPortBinding = new PortBinding();
-                $webPortBinding->setHostPort($WebPort);
-                $webPortBinding->setHostIp('0.0.0.0');
-                $portMap['80/tcp'] = [$webPortBinding];
-
-                break;
-        }
-
 
         $hostConfig = new HostConfig();
-        $hostConfig->setPortBindings($portMap);
 
         $restartPolicy = new RestartPolicy();
         $restartPolicy->setName("on-failure");
         $restartPolicy->setMaximumRetryCount(5);
         $hostConfig->setRestartPolicy($restartPolicy);
+
         //todo: set swap . its must be set
         //$hostConfig->setMemorySwap(30);
         $hostConfig->setMemory(61457280);
         $hostConfig->setKernelMemory(76700160);
 
+        $container_default_files = $courseConfig['container_default_files'];
+        $container_shared_files = $courseConfig['container_shared_files'].$key;
+        $ContainerFiles = $courseConfig['ContainerFiles'];
+
+        FileManager::recurse_copy($container_default_files, $container_shared_files);
+        $hostConfig->setBinds(["$container_shared_files:$ContainerFiles"]);
+
         $containerConfig->setHostConfig($hostConfig);
 
     }
+
+
 
     /**
      * @brief creating container.
@@ -280,23 +250,23 @@ class ContainerManager
      * @return bool|null
      * @throws \Exception
      */
-    public static function getContainerState($containerId)
+    public static function getContainerState($key)
     {
 
         try {
 
             $docker = self::makeDockerInstance();
-            $inspection = $docker->containerInspect($containerId);
+            $inspection = $docker->containerInspect($key);
 
             if ($inspection instanceof \Psr\Http\Message\ResponseInterface)
                 throw new \Exception('Error : The container may not exist !');
 
-            $result = $docker->containerInspect($containerId)->getState()->getRunning();
+            $result = $docker->containerInspect($key)->getState()->getRunning();
 
             return $result;
 
         }catch (\Exception $e){
-            throw new \Exception("Error: getContainerState() error\n".$e->getMessage()."\n".$e->getFile());
+           throw  $e;// throw new \Exception("Error: getContainerState() error\n".$e->getMessage()."\n".$e->getFile());
         }
     }
 
@@ -308,7 +278,7 @@ class ContainerManager
      * @param string $workingDir
      * @throws \Exception
      */
-    public static function dockerExecStart($containerId, $command, $workingDir='/home/violin')
+    public static function dockerExecStart($key, $command, $workingDir='/home/violin')
     {
 
 
@@ -324,7 +294,7 @@ class ContainerManager
             $execConfig->setAttachStderr(true);
             $execConfig->setCmd(["/bin/bash", "-c", $command]);
             $execConfig->setWorkingDir($workingDir);
-            $execid = $docker->containerExec($containerId, $execConfig)->getId();
+            $execid = $docker->containerExec($key, $execConfig)->getId();
             $execStartConfig = new ExecIdStartPostBody();
             //$execStartConfig->setDetach(false);
             // Execute the command
@@ -355,56 +325,39 @@ class ContainerManager
         }
     }
 
+
     /**
-     * @brief get running processes on container.
+     * @brief create an exec instance
      *
-     * @param $containerId
-     * @return \Docker\API\Model\ContainersIdTopGetResponse200|null|\Psr\Http\Message\ResponseInterface
+     * @param $key
+     * @param $command
+     * @param string $workingDir
+     * @return null|string
      * @throws \Exception
      */
-    public static function getProcessInContainer($containerId)
+    public static function exec($key, $command, $workingDir = "/home/violin")
     {
+
         try {
 
             $docker = self::makeDockerInstance();
-            return $docker->containerTop($containerId);
+
+            // SOURCE : https://github.com/docker-php/docker-php/pull/320/files?utf8=%E2%9C%93&diff=unified
+            //this snippet of code execute our command on running container
+            $execConfig = new ContainersIdExecPostBody();
+            $execConfig->setTty(true);
+            $execConfig->setAttachStdout(true);
+            $execConfig->setAttachStdin(true);
+            $execConfig->setAttachStderr(true);
+            $execConfig->setCmd(["/bin/bash", "-c", $command]);
+            $execConfig->setWorkingDir($workingDir);
+            $execId = $docker->containerExec($key, $execConfig)->getId();
+
+            return $execId;
 
         }catch (\Exception $e){
-            throw new \Exception("Error: couldn't get proccess of container at this time!\n".$e->getMessage()."\n".$e->getFile());
+            throw new \Exception("Error: Exec unSuccessful! \n".$e->getMessage()."\n".$e->getFile());
         }
-    }
-
-
-    /**
-     * @brief find open port on host.
-     *
-     * @return mixed
-     * @throws \Exception
-     */
-    public static function setPort()
-    {
-        $start = Config::get('port.start');
-        $end = Config::get('port.end');
-        $excluded_ports = Config::get('port.excluded_ports');
-        $current_port = Config::get('port.currentPort');
-
-        if($current_port > $end | $current_port < $start)
-            throw new \Exception("Error : ports ended in this host!");
-
-        $current_port++;
-
-        if (in_array($current_port, $excluded_ports))
-            $current_port++;
-
-        config(['port.currentPort' => $current_port]);
-        $fp = fopen(base_path() .'/config/port.php' , 'w');
-        fwrite($fp, '<?php return ' . var_export(config('port'), true) . ';');
-        fclose($fp);
-
-        if(!@fsockopen("127.0.0.1",$current_port))
-            return $current_port;
-        else
-            self::setPort();
     }
     
     
