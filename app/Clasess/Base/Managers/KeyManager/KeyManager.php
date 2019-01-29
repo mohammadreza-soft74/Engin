@@ -44,21 +44,20 @@ class KeyManager
      */
     public static function setKeytoSpecifiedContainerId($key , $containerId)
     {
-        $courseConfig = self::getCourseConfig($key);
+		$courseConfig = self::getCourseConfig($key);
 
-        try {
-            //create Redis server instance
-            $redis = RedisClientFactory::redis("key");
-            $timestamp = time();
+		try {
+			//create Redis server instance
+			$redis = RedisClientFactory::redis();
+			$timestamp = time();
 
-            $redis ->hmset($courseConfig["keysCacheName"].":".$key,"id", $containerId, "timeStamp", $timestamp);
+			$redis ->hmset($courseConfig["keysCacheName"].":".$key, "timeStamp", $timestamp);
 
-            $redis->disconnect();
+			$redis->disconnect();
 
-
-        } catch (\Exception $e) {
-            throw new \Exception("Error: There was a problem inserting id to the database ! .\n" . $e->getMessage()." \n".$e->getFile());
-        }
+		} catch (\Exception $e) {
+			throw new \Exception("Error: There was a problem inserting id to the database ! .\n" . $e->getMessage()." \n".$e->getFile());
+		}
     }
 
     /**
