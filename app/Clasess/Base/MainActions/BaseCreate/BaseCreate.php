@@ -12,7 +12,6 @@ namespace App\Clasess\Base\MainActions\BaseCreate;
 use App\Clasess\Base\Managers\KeyManager\KeyManager;
 use App\Clasess\Base\Managers\ContainerManager\ContainerManager;
 use Docker\API\Exception\ContainerInspectNotFoundException;
-use Docker\API\Exception\ExecInspectInternalServerErrorException;
 use Docker\API\Model\ContainersCreatePostBody;
 
 class BaseCreate

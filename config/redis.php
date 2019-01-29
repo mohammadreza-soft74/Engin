@@ -8,8 +8,8 @@
 
 return[
   "redis_conf"=>[
-      "ip"=>"127.0.0.1",
+      "ip"=>"192.168.85.35",
       "port"=>6379,
-      //"password"=>"m0t0r123"
+	  "password"=>"m0t0r123"
   ]
 ];
