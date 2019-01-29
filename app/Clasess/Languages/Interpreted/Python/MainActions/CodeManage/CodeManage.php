@@ -11,6 +11,7 @@ namespace App\Clasess\Languages\Interpreted\Python\MainActions\CodeManage;
 
 use App\Clasess\Base\MainActions\BaseCodeManager\BaseCodeManager;
 use App\Clasess\Base\Managers\FileManager\FileManager;
+use App\Clasess\Base\Managers\KeyManager\KeyManager;
 
 class CodeManage extends BaseCodeManager
 {
@@ -34,14 +35,19 @@ class CodeManage extends BaseCodeManager
     public function resetCode(String $path, String $key)
     {
 
-        parent::resetCode($path, $key);
+		parent::resetCode($path, $key);
 
-        FileManager::recurse_copy("/home/mohammadreza/python/default_files/python$path/first","/home/mohammadreza/$key$path");
+		$courseConfig = KeyManager::getCourseConfig($key);
+		$container_default_files = $courseConfig['container_default_files'].$path;
+		$container_shared_files = $courseConfig['container_shared_files'].$key.$path;
 
-        return[
-          "error" => false,
-          "result" => "Files were successfully resetted!",
-        ];
+		FileManager::deleteFilesInDirectory($container_shared_files);
+		FileManager::recurse_copy($container_default_files,  $container_shared_files);
+
+		return[
+			"error" => false,
+			"result" => "Files were successfully resetted!",
+		];
 
     }
 }
