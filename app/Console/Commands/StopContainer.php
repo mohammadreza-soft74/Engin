@@ -42,12 +42,11 @@ class StopContainer extends Command
      */
     public function handle()
     {
-        print_r(" time                          KEY                      status\n");
         $stopHoures = Config::get("docker.container_stop_time.houres");
         $stopMinutes = Config::get("docker.container_stop_time.minutes");
         $stopLogPath = $errorLogPath = Config::get("logs.stop.path");
         // for store key an container id in Redis
-        $redis = RedisClientFactory::redis("key");
+        $redis = RedisClientFactory::redis();
 
         $keys = $redis->keys("*");
 
@@ -66,29 +65,22 @@ class StopContainer extends Command
             $secconds = $diff->s;
 
 
-            $time = $now->format("H:i:s ");
-
             try {
                 if ($houres >= $stopHoures || $minutes >= $stopMinutes) {
 
-                    $containerId = $redis->hget($key, "id");
+                	$user = explode(':',$key);
+                	$userKey = $user[1];
 
-                    $stat = ContainerManager::getContainerState($containerId);
+
+                    $stat = ContainerManager::getContainerState($userKey);
 
 
                     if ($stat) {
-                        ContainerManager::stopContainer($containerId);
+						print_r($userKey."\n");
+                        ContainerManager::stopContainer($userKey);
                         $log = "Container $key Stoped!\nelapsed time => $houres:$minutes:$secconds\n*****************************************************\n";
                         error_log($log, 3, $stopLogPath);
-
-                        print_r("$time            $key   ");
-                        print_r("            Stopped\n");
                     }
-
-                }
-                else {
-                    print_r("$time            $key   ");
-                    print_r("            Running\n");
                 }
             }catch (\Exception $e){
                 print_r($e->getMessage());
