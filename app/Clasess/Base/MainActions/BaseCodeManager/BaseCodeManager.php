@@ -10,7 +10,7 @@ namespace App\Clasess\Base\MainActions\BaseCodeManager;
 
 use App\Clasess\Base\Managers\KeyManager\KeyManager;
 use App\Clasess\Base\Managers\FileManager\FileManager;
-use App\Clasess\Base\Communication\CommunicateFactory;
+use App\Clasess\Base\Managers\ContainerManager\ContainerManager;
 
 
 class BaseCodeManager
@@ -25,19 +25,21 @@ class BaseCodeManager
     protected function  finalCode(String $path, String $key)
     {
 
-        KeyManager::updateTimeStamp($key);
+		KeyManager::updateTimeStamp($key);
 
-        $request['path'] = $path;
+		$request['path'] = $path;
 
-        $file = new FileManager();
-        $files = $file->getDefaultFiles($path, 'last',$key);
+		$courseConfig = KeyManager::getCourseConfig($key);
+		$path = $courseConfig["files_on_host"] . $path ."/last"; //requesr->path = /py1/page1
 
-        $result =  [
-            'error' => false,
-            'result'=> $files
+		$files = FileManager::getFiles($path);
 
-        ];
-        return $result;
+		$result =  [
+			'error' => false,
+			'result'=> $files
+
+		];
+		return $result;
 
     }
 
@@ -51,24 +53,10 @@ class BaseCodeManager
      */
     protected function resetCode(String $path, String $key)
     {
-        KeyManager::updateTimeStamp($key);
-        $request['requestType'] = 'reset';
-        $request['path'] = $path;
 
-        $file = new FileManager();
-        $request['files'] = $file->getDefaultFiles($path,'first',$key);
+		if (!ContainerManager::getContainerState($key))
+			ContainerManager::startContainer($key);
 
-        $containerId = KeyManager::checkContainerIdWithKey($key);
-
-        if (!$containerId)
-            throw new \Exception("Error: Container is not available \n.check Key !" );
-
-        $webSocket = CommunicateFactory::communicateMethod("socket", $containerId);
-        $data = json_encode($request)."\n";
-        $webSocket->write($data);
-        $result = $webSocket->read(5);
-        $result = json_decode($result, true);
-
-        return $result;
+		KeyManager::updateTimeStamp($key);
     }
 }
