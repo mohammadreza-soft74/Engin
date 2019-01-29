@@ -9,11 +9,9 @@
 namespace App\Clasess\Base\Managers\ContainerManager;
 
 use App\Clasess\Base\Managers\FileManager\FileManager;
-use App\Clasess\Base\Managers\KeyManager\KeyManager;
 use Config;
 use Docker\Docker;
 use Docker\DockerClientFactory;
-use Docker\API\Model\PortBinding;
 use Docker\API\Model\HostConfig;
 use Docker\API\Model\RestartPolicy;
 use Docker\API\Model\ContainersCreatePostBody;
@@ -58,36 +56,36 @@ class ContainerManager
      */
     public static function setDefaultContainerConfig(ContainersCreatePostBody $containerConfig , $courseConfig, $key)
     {
-        // Read default container configs and set them
-        $defaultContainerConfig = Config::get("docker.container_config");
+		// Read default container configs and set them
+		$defaultContainerConfig = Config::get("docker.container_config");
 
-        foreach ( $defaultContainerConfig as $function => $arg )
-        {
-            $containerConfig->{$function}($arg);
+		foreach ( $defaultContainerConfig as $function => $arg )
+		{
+			$containerConfig->{$function}($arg);
 
-        }
+		}
 
 
-        $hostConfig = new HostConfig();
+		$hostConfig = new HostConfig();
 
-        $restartPolicy = new RestartPolicy();
-        $restartPolicy->setName("on-failure");
-        $restartPolicy->setMaximumRetryCount(5);
-        $hostConfig->setRestartPolicy($restartPolicy);
+		$restartPolicy = new RestartPolicy();
+		$restartPolicy->setName("on-failure");
+		$restartPolicy->setMaximumRetryCount(5);
+		$hostConfig->setRestartPolicy($restartPolicy);
 
-        //todo: set swap . its must be set
-        //$hostConfig->setMemorySwap(30);
-        $hostConfig->setMemory(61457280);
-        $hostConfig->setKernelMemory(76700160);
+		//todo: set swap . its must be set
+		//$hostConfig->setMemorySwap(30);
+		$hostConfig->setMemory(61457280);
+		$hostConfig->setKernelMemory(76700160);
 
-        $container_default_files = $courseConfig['container_default_files'];
-        $container_shared_files = $courseConfig['container_shared_files'].$key;
-        $ContainerFiles = $courseConfig['ContainerFiles'];
+		$container_default_files = $courseConfig['container_default_files'];
+		$container_shared_files = $courseConfig['container_shared_files'].$key;
+		$ContainerFiles = $courseConfig['ContainerFiles'];
 
-        FileManager::recurse_copy($container_default_files, $container_shared_files);
-        $hostConfig->setBinds(["$container_shared_files:$ContainerFiles"]);
+		FileManager::recurse_copy($container_default_files, $container_shared_files);
+		$hostConfig->setBinds(["$container_shared_files:$ContainerFiles"]);
 
-        $containerConfig->setHostConfig($hostConfig);
+		$containerConfig->setHostConfig($hostConfig);
 
     }
 
@@ -338,26 +336,26 @@ class ContainerManager
     public static function exec($key, $command, $workingDir = "/home/violin")
     {
 
-        try {
+		try {
 
-            $docker = self::makeDockerInstance();
+			$docker = self::makeDockerInstance();
 
-            // SOURCE : https://github.com/docker-php/docker-php/pull/320/files?utf8=%E2%9C%93&diff=unified
-            //this snippet of code execute our command on running container
-            $execConfig = new ContainersIdExecPostBody();
-            $execConfig->setTty(true);
-            $execConfig->setAttachStdout(true);
-            $execConfig->setAttachStdin(true);
-            $execConfig->setAttachStderr(true);
-            $execConfig->setCmd(["/bin/bash", "-c", $command]);
-            $execConfig->setWorkingDir($workingDir);
-            $execId = $docker->containerExec($key, $execConfig)->getId();
+			// SOURCE : https://github.com/docker-php/docker-php/pull/320/files?utf8=%E2%9C%93&diff=unified
+			//this snippet of code execute our command on running container
+			$execConfig = new ContainersIdExecPostBody();
+			$execConfig->setTty(true);
+			$execConfig->setAttachStdout(true);
+			$execConfig->setAttachStdin(true);
+			$execConfig->setAttachStderr(true);
+			$execConfig->setCmd(["/bin/bash", "-c", $command]);
+			$execConfig->setWorkingDir($workingDir);
+			$execId = $docker->containerExec($key, $execConfig)->getId();
 
-            return $execId;
+			return $execId;
 
-        }catch (\Exception $e){
-            throw new \Exception("Error: Exec unSuccessful! \n".$e->getMessage()."\n".$e->getFile());
-        }
+		}catch (\Exception $e){
+			throw new \Exception("Error: Exec unSuccessful! \n".$e->getMessage()."\n".$e->getFile());
+		}
     }
     
     
