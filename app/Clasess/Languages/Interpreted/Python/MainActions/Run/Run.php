@@ -25,25 +25,21 @@ class Run extends BaseRun
      */
     public function run($req)
     {
-        parent::run($req);
+		parent::run($req);
 
-        $key = $req["key"];
-        $path = $req["path"];
+		$key = $req["key"];
+		$path = $req["path"];
 
-        $courseConfig = KeyManager::getCourseConfig($key);
-        $container_shared_files = $courseConfig['container_shared_files'];
+		$courseConfig = KeyManager::getCourseConfig($key);
+		$container_shared_files = $courseConfig['container_shared_files'];
 
-        FileManager::createFiles($req["files"],$container_shared_files.$key.$path);
+		FileManager::createFiles($req["files"],$container_shared_files.$key.$path);
 
-        if(!$containerId = KeyManager::checkContainerIdWithKey($key))
-            throw new \Exception("container is not available ");
+		$workDir = $courseConfig["ContainerFiles"].$req['path'];
+		$command = "{$courseConfig["exec"]} {$courseConfig["defaultFileForExecute"]}";
 
+		$execId = ContainerManager::exec($key, $command, $workDir);
 
-        $workDir = $courseConfig["ContainerFiles"].$req['path'];
-        $command = "{$courseConfig["exec"]} {$courseConfig["defaultFileForExecute"]}";
-
-        $execId = ContainerManager::exec($containerId, $command, $workDir);
-
-        return $execId;
+		return $execId;
     }
 }
