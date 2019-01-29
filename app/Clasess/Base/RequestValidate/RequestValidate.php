@@ -51,7 +51,8 @@ class RequestValidate
 
         $validator = Validator::make($request->all(), [
             'path' => 'required|string|regex: /^\/[a-zA-Z0-9\-]+\/[a-zA-Z0-9\-]+$/',
-            'key' => 'required|string|regex:/^[1-2]+[-][0-9]+/'
+            'key' => 'required|string|regex:/^[1-2]+[-][0-9]+/',
+			'bash' => 'required|regex:/^[0-1]{0,1}$/',
         ]);
 
         if ($validator->fails())
@@ -61,7 +62,8 @@ class RequestValidate
         return[
 
             'key'=>$request->key,
-            'path'=>$request->path
+            'path'=>$request->path,
+			'bash' => $request->bash,
         ];
     }
 
@@ -116,7 +118,6 @@ class RequestValidate
         $ret["path"] = $request->path;
         $ret["key"] = $request->key;
         $ret["files"] = $files;
-        $ret['requestType'] = 'run';
 
         return $ret;
     }
