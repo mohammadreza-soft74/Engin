@@ -10,7 +10,6 @@ namespace App\Clasess\Base\MainActions\BaseRun;
 
 use App\Clasess\Base\Managers\KeyManager\KeyManager;
 use App\Clasess\Base\Managers\ContainerManager\ContainerManager;
-use App\Clasess\Base\Communication\CommunicateFactory;
 
 class BaseRun
 {
@@ -21,53 +20,33 @@ class BaseRun
      */
     protected function run($data)
     {
-        try {
 
-            $key = $data["key"];
+		try {
 
-            //courseName(ex: python , java , ...) is an array that contain some configs stored in config/files.php
-            //return each language config with course id.
-            $courseConfig = KeyManager::getCourseConfig($key);
+			$key = $data["key"];
 
-            //check existence of the given path on host . if its not valid throw an Exeption
-            $path = $courseConfig["files_on_host"] . $data["path"];
-            if (!is_dir($path))
-                throw  new \Exception("directory is not available ! \n may be this is not valid path!");
+			//courseName(ex: python , java , ...) is an array that contain some configs stored in config/files.php
+			//return each language config with course id.
+			$courseConfig = KeyManager::getCourseConfig($key);
 
-            //check for container availability with key
-            //it checks that container id is available on key file on host or not.
-            if (!$containerId = KeyManager::checkContainerIdWithKey($key))
-                throw new \Exception("container is not available ");
+			//check existence of the given path on host . if its not valid throw an Exeption
+			$path = $courseConfig["files_on_host"] . $data["path"];
+			if (!is_dir($path))
+				throw  new \Exception("directory is not available ! \n may be this is not valid path!");
 
-            //check container state (Running(1)/Existed(0)).
-            if (!ContainerManager::getContainerState($containerId))
-                ContainerManager::startContainer($containerId);
+			//check for container availability with key
+			//it checks that container id is available on key file on host or not.
+			/*if (!$containerId = KeyManager::checkContainerIdWithKey($key))
+				throw new \Exception("container is not available ");*/
 
-            KeyManager::updateTimeStamp($key);
+			//check container state (Running(1)/Existed(0)).
+			if (!ContainerManager::getContainerState($key))
+				ContainerManager::startContainer($key);
 
-            //get apache mapped port on container to send post request.
-            $mappedPorts = KeyManager::mappedPortsOnContainer($containerId);
+			KeyManager::updateTimeStamp($key);
 
-
-            //create WebSocket object to send and receive data to container.
-            $webSocket = CommunicateFactory::communicateMethod("socket", $containerId);
-            $send = json_encode($data) . "\n";
-            $webSocket->write($send);
-            $result = $webSocket->read(5);
-            $result = json_decode($result, true);
-
-
-            //ports return from host.
-            $ret["result"] = $result;
-            $ret["display"] = $mappedPorts["display"];
-
-        }catch (\Exception $e){
-            throw $e;
-        }
-
-
-        return $ret;
-
-
+		}catch (\Exception $e){
+			throw $e;
+		}
     }
 }
