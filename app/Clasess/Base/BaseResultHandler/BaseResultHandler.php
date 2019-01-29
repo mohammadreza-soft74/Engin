@@ -71,28 +71,6 @@ class BaseResultHandler
     {
 
 
-        $display = $result["display"];
-        $result = $result['result'];
-
-        if (!isset($result['error']))
-            throw new \Exception("container internal error: " .json_encode($result));
-
-
-        if ($result['error'] == true)
-            throw new \Exception("An error occurred on Container!\n" . 'Error Message:' . $result['message']);
-
-
-
-
-
-        return [
-            "error" => false,
-            "result" => $result["result"],
-            "display" => $display
-
-        ];
-
-
     }
 
     /**
@@ -103,21 +81,6 @@ class BaseResultHandler
      */
     public function pageLoad($result)
     {
-
-
-        if (is_bool($result))
-            return (string)$result;
-
-
-         /*if ($result['error'] == true)
-             throw new \Exception("An error occurred on Container!\n" .$result["message"]);*/
-
-
-        return [
-            "error" => false,
-            "watcher" => $result["watcher"]
-        ];
-
 
     }
 }
