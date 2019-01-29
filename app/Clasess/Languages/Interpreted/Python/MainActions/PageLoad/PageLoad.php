@@ -15,7 +15,6 @@ use App\Clasess\Base\Managers\ContainerManager\ContainerManager;
 class PageLoad extends BasePageLoad
 {
     // global variable for container id
-    private $containerId;
 
     /**
      * @brief python PageLoad() function derived from PageLaod base class
@@ -27,14 +26,25 @@ class PageLoad extends BasePageLoad
     public function PageLoad($req)
     {
 
-        $this->containerId = parent::PageLoad($req);
+		$bash = $req['bash'];
+		$key = $req['key'];
 
-        $path = "/home/violin/python".$req['path'];
+		parent::PageLoad($req);
 
-        $execId = ContainerManager::exec( $this->containerId, "bash files.sh $path");
+		$path = "/home/violin/python".$req['path'];
 
-        $result["execId"] = $execId;
+		$filesExecId = ContainerManager::exec( $key, "bash files.sh $path");
 
-        return $result;
+
+		if ($bash) {
+			$bashExecId = ContainerManager::exec($key, "bash");
+
+		}
+
+		return [
+
+			'bashExecId' => isset($bashExecId)? $bashExecId:false,
+			'filesExecId'=> $filesExecId,
+		];
     }
 }
