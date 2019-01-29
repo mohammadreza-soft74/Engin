@@ -23,10 +23,11 @@ class ResultHandler extends BaseResultHandler
 
     public function pageLoad($result)
     {
-        return
-            [
-                "error"=>false,
-                "execId"=>$result["execId"]
-            ];
+		return
+			[
+				"error"=>false,
+				"bashexecId"=>$result["bashExecId"],
+				"filesexecId"=>$result["filesExecId"],
+			];
     }
 }
