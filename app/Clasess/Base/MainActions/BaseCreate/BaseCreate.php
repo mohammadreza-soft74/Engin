@@ -11,6 +11,8 @@ namespace App\Clasess\Base\MainActions\BaseCreate;
 
 use App\Clasess\Base\Managers\KeyManager\KeyManager;
 use App\Clasess\Base\Managers\ContainerManager\ContainerManager;
+use Docker\API\Exception\ContainerInspectNotFoundException;
+use Docker\API\Exception\ExecInspectInternalServerErrorException;
 use Docker\API\Model\ContainersCreatePostBody;
 
 class BaseCreate
@@ -29,34 +31,29 @@ class BaseCreate
      */
     protected function createContainer($key)
     {
-        $containerId = KeyManager::checkContainerIdWithKey($key);  // check container availability with key on system
-        $stats = null;
 
-        switch($containerId){   // if container is available start it else create new container
+    	try{
 
-            case (true):    // start container
+			if (!ContainerManager::getContainerState( $key)) // get state of container(0=exited/1=running)
+				ContainerManager::startContainer($key);
 
-                if (!ContainerManager::getContainerState( $containerId)) // get state of container(0=exited/1=running)
-                    ContainerManager::startContainer($containerId);
+			$state = ContainerManager::getContainerState($key);
 
-                KeyManager::updateTimeStamp($key);  // update user actions(pageload, run, ...) time in redis to stop container
-                $stats = ContainerManager::getContainerState($containerId); // get container state(0/1) to return to moodle
+		}catch (\Exception $e){
 
-                break;
+    		if ($e instanceof ContainerInspectNotFoundException)
+			{
+				$containerConfig = new ContainersCreatePostBody();
+				$courseConfig = KeyManager::getCourseConfig($key);  // Get the settings for the course(/config/files.php)
+				$containerConfig->setImage($courseConfig["image"]);
+				ContainerManager::setDefaultContainerConfig($containerConfig, $courseConfig, $key);
+				$container = ContainerManager::createContainer( $containerConfig, $key);
+				ContainerManager::startContainer($container->getId());
+				KeyManager::setKeytoSpecifiedContainerId($key, $container->getId());
+				$state = ContainerManager::getContainerState( $container->getId());
 
-            case (false)://create container
-
-                $containerConfig = new ContainersCreatePostBody();
-                $courseConfig = KeyManager::getCourseConfig($key);  // Get the settings for the course(/config/files.php)
-                $containerConfig->setImage($courseConfig["image"]);
-                ContainerManager::setDefaultContainerConfig($containerConfig, $courseConfig);
-                $container = ContainerManager::createContainer( $containerConfig, $key);
-                ContainerManager::startContainer($container->getId());
-                KeyManager::setKeytoSpecifiedContainerId($key, $container->getId());
-                $stats = ContainerManager::getContainerState( $container->getId());
-
-                break;
-        }
-        return ['running'=>$stats];
+			}
+		}
+		return ['running'=>$state];
     }
 }
