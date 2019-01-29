@@ -20,19 +20,15 @@ class BasePageLoad
      * @return bool
      * @throws \Exception
      */
-    protected function PageLoad($req)
+    protected function PageLoad($requset)
     {
 
-        $key = $req['key'];
+		$key = $requset['key'];
 
-        if (!$containerId = KeyManager::checkContainerIdWithKey($key))
-            throw new \Exception("Error: Container is not available \n.check Key " );
+		if (!ContainerManager::getContainerState($key))
+			ContainerManager::startContainer($key);
 
-        if (!ContainerManager::getContainerState($containerId))
-            ContainerManager::startContainer($containerId);
+		KeyManager::updateTimeStamp($key);
 
-        KeyManager::updateTimeStamp($key);
-
-        return $containerId;
     }
 }
