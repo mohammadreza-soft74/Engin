@@ -10,56 +10,29 @@ namespace App\Clasess\Languages\WebBased\Javascript\MainActions\PageLoad;
 
 
 use App\Clasess\Base\MainActions\BasePageLoad\BasePageLoad;
-use App\Clasess\Base\Managers\ContainerManager\ContainerManager;
 use App\Clasess\Base\Managers\KeyManager\KeyManager;
+use App\Clasess\Base\Managers\FileManager\FileManager;
+
 
 class PageLoad extends BasePageLoad
 {
-    private $processLoopCount = 0;
-    private $containerId;
+
     public function PageLoad($request)
     {
+		//todo check service state
+		$hashKey = hash('md5', $request['key']);
 
-        $key = $request['key'];
+		$key = $request['key'];
 
-        if(!$this->containerId = KeyManager::checkContainerIdWithKey($key))
-            throw new \Exception("container is not available ");
+		$courseConfig = KeyManager::getCourseConfig($key);
 
-        $containerProcess = ContainerManager::getProcessInContainer( $this->containerId);
+		$path = $courseConfig['container_shared_files'].DIRECTORY_SEPARATOR.$hashKey.DIRECTORY_SEPARATOR.$request['path'];
 
-        $path = "/var/www/html/js".$request['path'];
-        ContainerManager::dockerExecStart($this->containerId, "PORT=7682 START=$path node /home/violin/xterm/demo/files.js 2> /home/violin/file_err.txt", $path);
+		$files = FileManager::getFiles($path);
 
-        parent::PageLoad($request);
-
-        $ports = KeyManager::mappedPortsOnContainer($this->containerId);
-
-
-        $this->checkProcess($containerProcess);
-
-        $result["watcher"] = $ports["watcher"];
-
-        return $result;
+		return [
+			'files'=>$files
+		];
     }
 
-    /**
-     * @param $processes
-     * @throws \Exception
-     */
-    private function checkProcess($processes)
-    {
-        if ($this->processLoopCount >= 3)
-            throw new \Exception("Error: file.js couldn't start!");
-
-        foreach ($processes->getProcesses() as $item) {
-            if ($item[7] == "node /home/violin/xterm/demo/files.js")
-                return ;
-        }
-        $containerProcess = ContainerManager::getProcessInContainer( $this->containerId);
-
-        $this->processLoopCount++ ;
-        sleep(1);
-
-        $this->checkProcess($containerProcess);
-    }
 }
