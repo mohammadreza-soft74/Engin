@@ -10,7 +10,8 @@ namespace App\Clasess\Languages\WebBased\Javascript\MainActions\Create;
 
 
 use App\Clasess\Base\MainActions\BaseCreate\BaseCreate;
-use App\Clasess\Base\Managers\ContainerManager\ContainerManager;
+use App\Clasess\Base\Managers\FileManager\FileManager;
+use App\Clasess\Base\Managers\KeyManager\KeyManager;
 
 class Create extends BaseCreate
 {
@@ -23,10 +24,15 @@ class Create extends BaseCreate
      */
     public function createContainer($request)
     {
-        $parent = parent::createContainer($request['key']);   // create container for user or start, stopped container
-        $command = "service apache2 start";
-        ContainerManager::dockerExecStart($request['key'], $command);  // start apache in container
+		//todo test container state
+		$courseConfig = KeyManager::getCourseConfig($request['key']);
+		$hashKey = hash('md5',$request['key']);
 
-        return $parent;
+		if (!is_dir($courseConfig['container_shared_files'].DIRECTORY_SEPARATOR.$hashKey))
+			FileManager::recurse_copy($courseConfig['container_default_files'],$courseConfig['container_shared_files'].DIRECTORY_SEPARATOR.$hashKey);
+
+		return [
+			"result"=>true
+		];
     }
 }
