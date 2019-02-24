@@ -14,21 +14,29 @@ use App\Clasess\Base\Managers\ContainerManager\ContainerManager;
 
 class BasePageLoad
 {
-    /**
-     * @brief on moodle page load this function just check container availability and its state
-     * @param $data
-     * @return bool
-     * @throws \Exception
-     */
-    protected function PageLoad($requset)
+	/**
+	 * @brief on moodle page load this function just check container state
+	 *
+	 * @param $requset
+	 * @throws \Exception
+	 */
+    protected function PageLoad($request)
     {
 
-		$key = $requset['key'];
+		$key = $request['key'];
+		$path = $request["path"];
 
-		if (!ContainerManager::getContainerState($key))
+		$courseConfig = KeyManager::getCourseConfig($key); //get language course config from config file
+
+		//check existence of the given path on server . if its not valid throw an Exeption
+		$path = $courseConfig["files_on_host"] . $path;
+		if (!is_dir($path))
+			throw  new \Exception("directory is not available !\nmay be this is not valid path!");
+
+		if (!ContainerManager::getContainerState($key)) //check container state(stop/running)
 			ContainerManager::startContainer($key);
 
-		KeyManager::updateTimeStamp($key);
+		KeyManager::updateTimeStamp($key); //update time stamp to stop container on time
 
     }
 }
