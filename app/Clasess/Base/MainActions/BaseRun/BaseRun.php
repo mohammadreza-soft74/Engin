@@ -32,18 +32,14 @@ class BaseRun
 			//check existence of the given path on host . if its not valid throw an Exeption
 			$path = $courseConfig["files_on_host"] . $data["path"];
 			if (!is_dir($path))
-				throw  new \Exception("directory is not available ! \n may be this is not valid path!");
+				throw  new \Exception("directory is not available !\nmay be this is not valid path!");
 
-			//check for container availability with key
-			//it checks that container id is available on key file on host or not.
-			/*if (!$containerId = KeyManager::checkContainerIdWithKey($key))
-				throw new \Exception("container is not available ");*/
 
-			//check container state (Running(1)/Existed(0)).
-			if (!ContainerManager::getContainerState($key))
+
+			if (!ContainerManager::getContainerState($key)) //check container state (Running(1)/Existed(0)).
 				ContainerManager::startContainer($key);
 
-			KeyManager::updateTimeStamp($key);
+			KeyManager::updateTimeStamp($key); // update time stamp to stop container on time
 
 		}catch (\Exception $e){
 			throw $e;
