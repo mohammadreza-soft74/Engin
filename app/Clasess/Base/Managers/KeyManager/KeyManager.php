@@ -37,7 +37,8 @@ class KeyManager
     }
 
     /**
-     * @brief Set the key of new user to the corresponding containerId
+     * @brief Set the key of new user to the corresponding containerId.
+	 *
      * @param $key
      * @param $containerId
      * @throws \Exception
@@ -61,7 +62,8 @@ class KeyManager
     }
 
     /**
-     * @brief search for containerId in memory
+     * @brief search for containerId in memory.
+	 *
      * @detail if container id is available returns container id else returns false
      * @param string $key
      * @return bool
@@ -91,7 +93,8 @@ class KeyManager
     }
 
     /**
-     * @brief mapped ports on container
+     * @brief mapped ports on container.
+	 *
      * @detail Docker\API\Model\ContainersIdJsonGetResponse200  setExecIDs() function input tu array because of some error
      * @param $containerId
      * @return mixed
@@ -137,6 +140,7 @@ class KeyManager
 
     /**
      * @brief update user action time on redis.
+	 *
      * @detail update user main actions time on redis, in each main actions such as page load or run this time update in redis to help stop user container.
      * @param $key
      * @throws \Exception
@@ -161,7 +165,8 @@ class KeyManager
     }
 
     /**
-     * @brief get language config
+     * @brief get language config.
+	 *
      * @detail get language config and other configs in it with key that contain course id
      * @param $key
      * @return mixed

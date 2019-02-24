@@ -21,12 +21,11 @@ class RedisClientFactory
     public static function redis()
     {
 
-        $ip = Config::get('redis.redis_conf.ip');
-        $port = Config::get('redis.redis_conf.port');
-        $password = Config::get('redis.redis_conf.password');
+        $ip = Config::get('redis.redis_conf.ip');//redis server ip
+        $port = Config::get('redis.redis_conf.port');//redis server port
+        $password = Config::get('redis.redis_conf.password');//redis server password
 
-
-
+		//return redis client instance
             return new Client(array(
                 'scheme'   => 'tcp',
                 'host'     => $ip,

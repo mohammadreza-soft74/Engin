@@ -56,32 +56,36 @@ class ContainerManager
      */
     public static function setDefaultContainerConfig(ContainersCreatePostBody $containerConfig , $courseConfig, $key)
     {
-		// Read default container configs and set them
+		// Read default container configs and set them.
 		$defaultContainerConfig = Config::get("docker.container_config");
 
+		//set default config from config file.
 		foreach ( $defaultContainerConfig as $function => $arg )
 		{
 			$containerConfig->{$function}($arg);
 
 		}
 
-
 		$hostConfig = new HostConfig();
-
+		//
+		// define restart policy to restart container on failure.
+		//
 		$restartPolicy = new RestartPolicy();
 		$restartPolicy->setName("on-failure");
 		$restartPolicy->setMaximumRetryCount(5);
 		$hostConfig->setRestartPolicy($restartPolicy);
-
 		//todo: set swap . its must be set
 		//$hostConfig->setMemorySwap(30);
 		$hostConfig->setMemory(61457280);
 		$hostConfig->setKernelMemory(76700160);
 
-		$container_default_files = $courseConfig['container_default_files'];
-		$container_shared_files = $courseConfig['container_shared_files'].$key;
-		$ContainerFiles = $courseConfig['ContainerFiles'];
 
+		$container_default_files = $courseConfig['container_default_files']; //language default files on server.
+		$container_shared_files = $courseConfig['container_shared_files'].$key; // container files directory.
+		$ContainerFiles = $courseConfig['ContainerFiles'];//bind directory on container to directory on server.
+		//
+		//copy default files to binded directory.
+		//
 		FileManager::recurse_copy($container_default_files, $container_shared_files);
 		$hostConfig->setBinds(["$container_shared_files:$ContainerFiles"]);
 
@@ -93,9 +97,7 @@ class ContainerManager
 
     /**
      * @brief creating container.
-     * 
-     * @uses self::makeDockerInstance 
-     * @uses containerCreate
+     *
      * @param ContainersCreatePostBody $containerConfig
      * @param $key
      * @return \Docker\API\Model\ContainersCreatePostResponse201|null|\Psr\Http\Message\ResponseInterface
@@ -103,7 +105,7 @@ class ContainerManager
      */
     public static function createContainer(ContainersCreatePostBody $containerConfig, $key )
     {
-        // Create ContainerHelper
+
         try
         {
             $docker = self::makeDockerInstance();
@@ -114,18 +116,6 @@ class ContainerManager
             throw new \Exception("Error: Couldn't create the container!\n".$e->getMessage().$e->getFile());
         }
 
-        /*
-         * Check if it was successful.
-         * create method of containerManager returns one of these two cases :
-         *      failed  : \Psr\Http\Message\ResponseInterface
-         *      succeed : \Docker\API\Model\ContainerCreateResult
-         */
-        if ( $creation instanceof \Psr\Http\Message\ResponseInterface )
-        {
-            throw new \Exception("Error: Couldn't create the container!\n{$creation->getBody()}");
-        }
-
-        // If the creation was successful, we have an instance of the ContainerCreateResult class
         return $creation;
     }
 
@@ -147,9 +137,7 @@ class ContainerManager
 
     /**
      * @brief stop running container.
-     *
-     * @uses self::makeDockerInstance
-     * @uses containerStop
+	 *
      * @param $containerId
      * @throws \Exception
      */
@@ -169,8 +157,6 @@ class ContainerManager
     /**
      * @brief attach to web socket of container.
      *
-     * @uses containerAttachWebsocket
-     * @uses self::makeDockerInstance
      * @param $containerId
      * @return null|\Psr\Http\Message\ResponseInterface
      * @throws \Exception

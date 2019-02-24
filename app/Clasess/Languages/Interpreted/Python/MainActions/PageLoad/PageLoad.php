@@ -14,7 +14,6 @@ use App\Clasess\Base\Managers\ContainerManager\ContainerManager;
 
 class PageLoad extends BasePageLoad
 {
-    // global variable for container id
 
     /**
      * @brief python PageLoad() function derived from PageLaod base class
@@ -33,11 +32,11 @@ class PageLoad extends BasePageLoad
 
 		$path = "/home/violin/python".$req['path'];
 
-		$filesExecId = ContainerManager::exec( $key, "bash files.sh $path");
+		$filesExecId = ContainerManager::exec( $key, "bash nadowatcher $path");
 
 
 		if ($bash) {
-			$bashExecId = ContainerManager::exec($key, "bash");
+			$bashExecId = ContainerManager::exec($key, "sh","$path");
 
 		}
 

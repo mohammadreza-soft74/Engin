@@ -19,11 +19,8 @@ class BaseCreate
     /**
      * @brief create or start container.
      *
-     * @detail create container its not exist if it exist start it and returns its state(running=1/stopped=0).
+     * @detail create container if its not exist , if it exist start it and returns its state(running=1/stopped=0).
      * @fn protected createContainer
-     * @see KeyManager:checkContainerIdWithKey
-     * @see ContainerManager::getContainerState
-     * @see KeyManager::updateTimeStamp
      * @param $key
      * @return array
      * @throws \Exception
@@ -40,15 +37,18 @@ class BaseCreate
 
 		}catch (\Exception $e){
 
+    		//
+			//if container is not available , ContainerInspectNotFoundException exception occur.
+			//
     		if ($e instanceof ContainerInspectNotFoundException)
 			{
 				$containerConfig = new ContainersCreatePostBody();
 				$courseConfig = KeyManager::getCourseConfig($key);  // Get the settings for the course(/config/files.php)
-				$containerConfig->setImage($courseConfig["image"]);
-				ContainerManager::setDefaultContainerConfig($containerConfig, $courseConfig, $key);
-				$container = ContainerManager::createContainer( $containerConfig, $key);
-				ContainerManager::startContainer($container->getId());
-				KeyManager::setKeytoSpecifiedContainerId($key, $container->getId());
+				$containerConfig->setImage($courseConfig["image"]); //set image from course config in config file
+				ContainerManager::setDefaultContainerConfig($containerConfig, $courseConfig, $key); //set some default config on container
+				$container = ContainerManager::createContainer( $containerConfig, $key); //create container with Previous step config
+				ContainerManager::startContainer($container->getId()); // start created container
+				KeyManager::setKeytoSpecifiedContainerId($key, $container->getId()); //add key with time stamp to redis database
 				$state = ContainerManager::getContainerState( $container->getId());
 
 			}

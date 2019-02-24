@@ -17,6 +17,7 @@ class BaseCodeManager
 {
     /**
      * @brief return final code from host.
+	 *
      * @param String $path
      * @param String $key
      * @return array
@@ -25,14 +26,14 @@ class BaseCodeManager
     protected function  finalCode(String $path, String $key)
     {
 
-		KeyManager::updateTimeStamp($key);
+		KeyManager::updateTimeStamp($key); // update time stamp to stop container on time
 
 		$request['path'] = $path;
 
-		$courseConfig = KeyManager::getCourseConfig($key);
+		$courseConfig = KeyManager::getCourseConfig($key); // get language config from config file
 		$path = $courseConfig["files_on_host"] . $path ."/last"; //requesr->path = /py1/page1
 
-		$files = FileManager::getFiles($path);
+		$files = FileManager::getFiles($path); // get files in json format from given path
 
 		$result =  [
 			'error' => false,
@@ -54,9 +55,9 @@ class BaseCodeManager
     protected function resetCode(String $path, String $key)
     {
 
-		if (!ContainerManager::getContainerState($key))
+		if (!ContainerManager::getContainerState($key)) //get container state(stop/runnig)
 			ContainerManager::startContainer($key);
 
-		KeyManager::updateTimeStamp($key);
+		KeyManager::updateTimeStamp($key); //update time stamp to stop container on time
     }
 }
