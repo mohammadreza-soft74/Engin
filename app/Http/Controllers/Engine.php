@@ -225,12 +225,18 @@ class Engine extends Controller
 
 
 		$time = $time->format("H:i:s");
-		$date = $persianDate->gregorian_to_jalali($year, $month, $day ,"/");
-
+		$date = $persianDate->gregorian_to_jalali($year, $month, $day ,"-");
 
 		$error = "$message\n\n|time>> $time <<time| ----- |Date>> $date <<Date| \n******************************************************************\n";
 		$errorLogPath = Config::get("logs.error.path");
-		error_log($error,3,"$errorLogPath$key");
+
+		if (!is_dir($errorLogPath.$date)) {
+			$oldmask = umask(0);
+			mkdir($errorLogPath . $date, 0777, true);
+			umask($oldmask);
+		}
+
+		error_log($error,3,$errorLogPath.$date.'/'.$key);
 		return [
 			"error" => true,
 			"message" => $message
