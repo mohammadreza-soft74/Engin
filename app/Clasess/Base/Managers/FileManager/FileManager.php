@@ -109,6 +109,9 @@ class FileManager
 	 */
 	public static function recurse_copy($src,$dst)
 	{
+		if (!is_dir($src)) {
+			throw new \Exception("Error : directory ($src) is not available !");
+		}
 		$dir = opendir($src);
 		$oldmask = umask(0);
 		@mkdir($dst,0777,true);
@@ -136,18 +139,19 @@ class FileManager
 	 */
 	public  static function deleteFilesInDirectory($path)
 	{
-
+		
 		if (!is_dir($path))
-			throw  new \Exception("directory is not available !");
+			throw  new \Exception("Error: $path is not valid directory !");
 
-
-		if (!$dh = opendir($path))
-			throw  new \Exception("opendir result must be Resource!");
 		try {
 
-			while ($file = readdir($dh)) {
-				@unlink($path . '/' . $file);
+			$di = new \RecursiveDirectoryIterator($path, \FilesystemIterator::SKIP_DOTS);
+			$ri = new \RecursiveIteratorIterator($di, \RecursiveIteratorIterator::CHILD_FIRST);
+			foreach ( $ri as $file ) {
+			    $file->isDir() ?  rmdir($file) : unlink($file);
 			}
+			return true;
+			
 		}catch (\Exception $e){
 
 			throw new \Exception("Couldn't remove user Code!".$e->getMessage());
