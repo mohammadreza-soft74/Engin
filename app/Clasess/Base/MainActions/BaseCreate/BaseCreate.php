@@ -51,6 +51,8 @@ class BaseCreate
 				KeyManager::setKeytoSpecifiedContainerId($key, $container->getId()); //add key with time stamp to redis database
 				$state = ContainerManager::getContainerState( $container->getId());
 
+			}else{
+    			throw $e;
 			}
 		}
 		return ['running'=>$state];
