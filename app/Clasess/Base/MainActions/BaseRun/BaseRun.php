@@ -30,9 +30,9 @@ class BaseRun
 			$courseConfig = KeyManager::getCourseConfig($key);
 
 			//check existence of the given path on host . if its not valid throw an Exeption
-			$path = $courseConfig["files_on_host"] . $data["path"];
+			$path = $courseConfig["container_default_files"] . $data["path"];
 			if (!is_dir($path))
-				throw  new \Exception("directory is not available !\nmay be this is not valid path!");
+				throw  new \Exception("Error: directory ($path) is not available !\nmay be this is not valid path!");
 
 
 

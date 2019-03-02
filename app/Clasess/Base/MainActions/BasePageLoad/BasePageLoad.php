@@ -17,7 +17,7 @@ class BasePageLoad
 	/**
 	 * @brief on moodle page load this function just check container state
 	 *
-	 * @param $requset
+	 * @param $request
 	 * @throws \Exception
 	 */
     protected function PageLoad($request)
@@ -28,10 +28,10 @@ class BasePageLoad
 
 		$courseConfig = KeyManager::getCourseConfig($key); //get language course config from config file
 
-		//check existence of the given path on server . if its not valid throw an Exeption
-		$path = $courseConfig["files_on_host"] . $path;
+		//check existence of the given path on server . if its not valid throw an Exception
+		$path = $courseConfig["container_default_files"] . $path;
 		if (!is_dir($path))
-			throw  new \Exception("directory is not available !\nmay be this is not valid path!");
+			throw  new \Exception("Error: directory ($path) is not available !\nmay be this is not valid path!");
 
 		if (!ContainerManager::getContainerState($key)) //check container state(stop/running)
 			ContainerManager::startContainer($key);
