@@ -102,9 +102,10 @@ class FileManager
 
 
 	/**
-	 * recursive copy files from source to destination
+	 * @brief recursive copy files from source to destination
 	 * @param $src
 	 * @param $dst
+	 * @throws \Exception
 	 */
 	public static function recurse_copy($src,$dst)
 	{
@@ -127,8 +128,10 @@ class FileManager
 
 
 	/**
-	 * delete files in path
+	 * @brief delete files in path.
+	 *
 	 * @param $path
+	 * @return bool
 	 * @throws \Exception
 	 */
 	public  static function deleteFilesInDirectory($path)
