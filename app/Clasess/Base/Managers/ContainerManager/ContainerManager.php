@@ -75,7 +75,7 @@ class ContainerManager
 		$restartPolicy->setMaximumRetryCount(5);
 		$hostConfig->setRestartPolicy($restartPolicy);
 		//todo: set swap . its must be set
-		//$hostConfig->setMemorySwap(30);
+		$hostConfig->setMemorySwap(61457280);
 		$hostConfig->setMemory(61457280);
 		$hostConfig->setKernelMemory(76700160);
 
